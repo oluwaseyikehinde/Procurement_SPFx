@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "procurement-request-client-side-solution",
+    "id": "9e61dc2a-496b-4536-b725-809d977ac08a",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.18.2"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "procurement-request description"
+      },
+      "longDescription": {
+        "default": "procurement-request description"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "procurement-request Feature",
+        "description": "The feature that activates elements of the procurement-request solution.",
+        "id": "1c0967f7-d66d-4390-9bf6-33d5d894034c",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/procurement-request.sppkg"
+  }
+}
