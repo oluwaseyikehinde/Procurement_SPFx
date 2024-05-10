@@ -1,0 +1,67 @@
+.myNavigation {
+  width: 100%; /* Adjust width as needed */
+  background-color: #f4f4f4;
+  border-bottom: 1px solid #ddd;
+}
+
+.navigationList {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  display: flex; /* Change to flex to arrange items horizontally */
+}
+
+.navigationItem {
+  border-right: 1px solid #ddd; /* Add border-right to separate items */
+}
+
+.navigationItem:last-child {
+  border-right: none; /* Remove border-right for the last item */
+}
+
+.navigationItemIcon {
+  margin-right: 10px; /* Adjust spacing between icon and text */
+}
+
+.navigationItemLink {
+  display: flex;
+  align-items: center; /* Align icon and text vertically */
+  padding: 10px;
+  text-decoration: none;
+  color: #333;
+}
+
+.navigationItemLink:hover {
+  background-color: #ddd;
+}
+
+.subNavigationList {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.subNavigationItem {
+  border-bottom: 1px solid #ddd;
+}
+
+.subNavigationItemIcon {
+  margin-right: 10px; /* Adjust spacing between icon and text */
+}
+
+.subNavigationItemLink {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 20px;
+  text-decoration: none;
+  color: #666;
+}
+
+.subNavigationItemLink:hover {
+  background-color: #f0f0f0;
+}
+
+.icon {
+    margin-right: 5px;
+    vertical-align: middle;
+}

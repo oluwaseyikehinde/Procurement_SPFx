@@ -5,6 +5,7 @@
   padding: 1em;
   color: "[theme:bodyText, default: #323130]";
   color: var(--bodyText);
+
   &.teams {
     font-family: $ms-font-family-fallbacks;
   }
@@ -30,5 +31,66 @@
       color: "[theme:linkHovered, default: #014446]";
       color: var(--linkHovered); // note: CSS Custom Properties support is limited to modern browsers only
     }
+  }
+}
+
+.maincontainer {
+  padding: 10px;
+  background: #f2f2f2;
+}
+
+.mainheader {
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.sectioncontainer {
+  width: 100%;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  background: #fff;
+  border-radius: 5px;
+}
+
+label {
+  margin-bottom: 5px;
+  font-weight: 400;
+}
+
+input[type="text"],
+input[type="date"] {
+  width: 60%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  background: #fff;
+  border-radius: 3px;
+  font-size: 12px;
+  margin-bottom: 20px;
+  margin-left: 5px;
+}
+
+.labeltag {
+  color: #ccc;
+}
+
+.buttoncontainer {
+    display: flex;
+    justify-content: flex-end;
+}
+
+button[type="submit"] {
+  width: 80px;
+  padding: 8px; 
+  background-color: #3b72d8;
+  color: #fff;
+  border: none;
+  border-radius: 0px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #0056b3;
   }
 }
