@@ -26,6 +26,7 @@ export default class ProcurementWebPart extends BaseClientSideWebPart<IProcureme
       Procurement,
       {
         description: this.properties.description,
+        context: this.context,
         isDarkTheme: this._isDarkTheme,
         environmentMessage: this._environmentMessage,
         hasTeamsContext: !!this.context.sdks.microsoftTeams,

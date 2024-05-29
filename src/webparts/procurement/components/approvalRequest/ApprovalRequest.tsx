@@ -1,23 +1,22 @@
 import * as React from 'react';
-import { INewRequestFormFields } from './IRequestFields';
+import { IApprovalRequestFormFields } from './IApprovalRequestFields';
 import { IWebPartProps } from "../IProcurementProps";
-import { getMyRequestListItems } from '../utils/sp.utils';
+import { getListItems } from '../utils/sp.utils';
 import styles from '../Procurement.module.scss';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.min.js';
 import toast from 'react-hot-toast';
+import { listNames } from '../utils/models.utils';
 
-const LIST_NAME = 'Procurement List';
-
-interface ListItem extends INewRequestFormFields {
+interface ListItem extends IApprovalRequestFormFields {
     id: number;
 }
 
-interface RecordsTableState {
+interface ApprovalRecordsTableState {
     records: ListItem[];
 }
 
-export class RecordsTable extends React.Component<IWebPartProps, RecordsTableState> {
+export class ApprovalRecordsTable extends React.Component<IWebPartProps, ApprovalRecordsTableState> {
     constructor(props: IWebPartProps) {
         super(props);
         this.state = {
@@ -27,8 +26,8 @@ export class RecordsTable extends React.Component<IWebPartProps, RecordsTableSta
 
     async componentDidMount() {
         try {
-            // Fetch list items using the getMyRequestListItems function from ProcurementService
-            const listItems: INewRequestFormFields[] = await getMyRequestListItems(this.props.context, LIST_NAME);
+            // Fetch list items using the getListItems function from ProcurementService
+            const listItems: IApprovalRequestFormFields[] = await getListItems(this.props.context, listNames.request);
             // Transform list items to include an id property
             const recordsWithId = listItems.map((item, index) => ({ ...item, id: index + 1 }));
             this.setState({ records: recordsWithId });

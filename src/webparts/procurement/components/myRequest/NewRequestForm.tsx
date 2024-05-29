@@ -1,19 +1,26 @@
 import * as React from 'react';
-//import { sp } from '@pnp/sp';
-import { createListItem } from '../serviceOperation/ProcurementService'; // Import the create function
+import { createMyRequestListItem, getListItems } from '../utils/sp.utils';
+import { getLoggedInUserData } from '../utils/graph.utils';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.min.js';
 import styles from '../Procurement.module.scss';
 import { INewRequestFormFields } from './IRequestFields';
+import { IWebPartProps } from "../IProcurementProps";
+import EditableGrid from './EditableGrid';
+import { IGridRow } from './IGridRow';
+import toast from 'react-hot-toast';
+import { listNames } from '../utils/models.utils';
 
-const LIST_NAME = 'Procurement List';
+
 
 interface NewRequestFormState {
     formData: INewRequestFormFields;
+    gridRows: IGridRow[];
+    supplierOptions: { ID: number; BusinessName: string }[];
 }
 
-export class NewRequestForm extends React.Component<{}, NewRequestFormState> {
-    constructor(props: {}) {
+export class NewRequestForm extends React.Component<IWebPartProps, NewRequestFormState> {
+    constructor(props: IWebPartProps) {
         super(props);
         this.state = {
             formData: {
@@ -21,24 +28,41 @@ export class NewRequestForm extends React.Component<{}, NewRequestFormState> {
                 Department: '',
                 DeliveryDate: '',
                 Supplier: ''
-            }
+            },
+            gridRows: [{ Id: 1, Description: '', UnitPrice: 0, Quantity: 0, TotalPrice: 0 }],
+            supplierOptions: []
         };
     }
 
-    // async componentDidMount() {
-    //     try {
-    //         const currentUser: = await sp.web.currentUser.get();
-    //         this.setState(prevState => ({
-    //             formData: {
-    //                 ...prevState.formData,
-    //                 initiator: currentUser.Title,
-    //                 department: currentUser.Department
-    //             }
-    //         }));
-    //     } catch (error) {
-    //         console.error('Error fetching current user information:', error);
-    //     }
-    // }
+    async componentDidMount() {
+        try {
+            // Fetch Supplier List
+            const suppliers = await getListItems(this.props.context, listNames.suppliers);
+            const supplierOptions = suppliers.map((supplier: any) => ({ ID: supplier.ID, BusinessName: supplier.BusinessName }));
+
+            // Fetch Current User
+            const currentUser = await getLoggedInUserData(this.props.context);
+
+            console.log("eeeeeeeeeeeeeeeeeeeeee", currentUser)
+
+            // Update state
+            this.setState({
+                supplierOptions,
+                formData: {
+                    ...this.state.formData,
+                    Initiator: currentUser.displayName || '',
+                    Department: currentUser.department || ''
+                }
+            });
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    }
+
+
+    generateUniqueId = () => {
+        return this.state.gridRows.length + 1;
+    };
 
     handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value } = event.target;
@@ -50,22 +74,55 @@ export class NewRequestForm extends React.Component<{}, NewRequestFormState> {
         }));
     };
 
+
+    handleGridAddRow = () => {
+        const Id = this.generateUniqueId();
+        const newRow: IGridRow = { Id: Id, Description: '', UnitPrice: 0, Quantity: 0, TotalPrice: 0 };
+        this.setState(prevState => ({
+            gridRows: [...prevState.gridRows, newRow]
+        }));
+    };
+
+    handleGridDeleteRow = (id: number) => {
+        this.setState(prevState => ({
+            gridRows: prevState.gridRows.filter(row => row.Id !== id)
+        }), () => {
+            // After deleting a row, update the IDs of the remaining rows
+            const updatedRows = this.state.gridRows.map((row, index) => ({
+                ...row,
+                Id: index + 1 // Update the ID to the new index + 1
+            }));
+            this.setState({ gridRows: updatedRows });
+        });
+    };
+
+    handleGridChangeRow = (id: number, updatedRow: IGridRow) => {
+        this.setState(prevState => ({
+            gridRows: prevState.gridRows.map(row => (row.Id === id ? updatedRow : row))
+        }));
+    };
+
     handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         try {
-            await createListItem(LIST_NAME, this.state.formData);
+            const requestData = {
+                ...this.state.formData,
+                gridRows: this.state.gridRows
+            };
+
+            await createMyRequestListItem(this.props.context, listNames.request, listNames.requestItem, requestData);
             this.setState({
                 formData: {
                     Initiator: '',
                     Department: '',
                     DeliveryDate: '',
                     Supplier: ''
-                }
+                },
+                gridRows: [{ Id: 1, Description: '', UnitPrice: 0, Quantity: 0, TotalPrice: 0 }]
             });
-            alert('Request submitted successfully!');
+            toast.success('Procurement submitted successfully!');
         } catch (error) {
-            console.error('Error submitting request:', error);
-            alert('Failed to submit request. Please try again later.');
+            toast.error('Failed to submit Procurement.', error);
         }
     };
 
@@ -81,23 +138,37 @@ export class NewRequestForm extends React.Component<{}, NewRequestFormState> {
                         <div className="row">
                             <div className='col'>
                                 <label>Initiator <span className={styles.labeltag}>. . . . . . . . . . </span></label>
-                                <input type="text" name="Initiator" value={Initiator} onChange={this.handleInputChange} />
+                                <input className={styles.formcontrol} type="text" name="Initiator" value={Initiator} onChange={this.handleInputChange} disabled />
                             </div>
                             <div className='col'>
                                 <label>Department <span className={styles.labeltag}>. . . . . . </span></label>
-                                <input type="text" name="Department" value={Department} onChange={this.handleInputChange} />
+                                <input className={styles.formcontrol} type="text" name="Department" value={Department} onChange={this.handleInputChange} disabled />
                             </div>
                         </div>
                         <div className="row">
                             <div className='col'>
                                 <label>Delivery Date <span className={styles.labeltag}>. . . . . </span></label>
-                                <input type="date" name="DeliveryDate" value={DeliveryDate} onChange={this.handleInputChange} />
+                                <input className={styles.formcontrol} type="date" name="DeliveryDate" value={DeliveryDate} onChange={this.handleInputChange} />
                             </div>
                             <div className='col'>
                                 <label>Supplier <span className={styles.labeltag}> . . . . . . . . . </span></label>
-                                <input type="text" name="Supplier" value={Supplier} onChange={this.handleInputChange} />
+                                {/* <input className={styles.formcontrol} type="text" name="Supplier" value={Supplier} onChange={this.handleInputChange} /> */}
+                                <select className={styles.formcontrol} name="Supplier" value={Supplier} onChange={this.handleInputChange}>
+                                    <option value="">Select Supplier</option>
+                                    {this.state.supplierOptions.map(option => (
+                                        <option key={option.ID} value={option.BusinessName}>
+                                            {option.BusinessName}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
                         </div>
+                        <EditableGrid
+                            rows={this.state.gridRows}
+                            onAddRow={this.handleGridAddRow}
+                            onDeleteRow={this.handleGridDeleteRow}
+                            onChangeRow={this.handleGridChangeRow}
+                        />
                         <div className={styles.buttoncontainer}>
                             <button type="submit">Submit</button>
                         </div>
