@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { IGridRow } from './IGridRow';
 import styles from '../Procurement.module.scss';
+import { Icon } from 'office-ui-fabric-react/lib/Icon';
+
 
 interface EditableGridProps {
     rows: IGridRow[];
@@ -46,7 +48,7 @@ const EditableGrid: React.FC<EditableGridProps> = ({ rows, onAddRow, onDeleteRow
                             <td><input className={styles.tableform} type="number" value={row.Quantity} onChange={e => handleChange(row.Id, 'Quantity', parseInt(e.target.value))} /></td>
                             <td><input className={styles.tableform} type="number" value={row.UnitPrice} onChange={e => handleChange(row.Id, 'UnitPrice', parseFloat(e.target.value))} /></td>
                             <td><input className={styles.tableform} type="number" value={row.UnitPrice * row.Quantity} disabled/></td>
-                            <td><button onClick={() => onDeleteRow(row.Id)}>Delete</button></td>
+                            <td><Icon iconName="Delete" className={styles.tableicon} onClick={() => onDeleteRow(row.Id)} /></td>
                         </tr>
                     ))}
                 </tbody>

@@ -23,6 +23,11 @@
     transition: box-shadow .2s;
 }
 
+.active {
+    font-weight: bold;
+    color: #0078d4; 
+}
+
 .menuicons {
     color: black;
     font-size: 13px;
@@ -35,20 +40,32 @@
 .subnavcontainer {
     display: flex;
     justify-content: flex-start;
+    border-bottom: 1px solid #ddd;
+    width: 100%;
 }
 
 .subnav {
-    width: 80px;
-    padding: 8px;
-    background-color: #3b72d8;
-    color: #fff;
+    display: flex;
+    align-items: center;
+    width: 60px;
+    padding: 4px;
+    color: #000;
     border: none;
-    border-radius: 0px;
     cursor: pointer;
     font-size: 12px;
     transition: background-color 0.3s ease;
-
     &:hover {
-        background-color: #0056b3;
+        background-color: #3498db;
     }
+}
+
+.subnavitem {
+    display: flex;
+    align-items: center;
+}
+
+.icon {
+    padding-left: 3px;
+    margin-right: 3px;
+    vertical-align: middle;
 }

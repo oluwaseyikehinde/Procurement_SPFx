@@ -31,6 +31,24 @@ label {
   background: #fff;
 }
 
+.tableicon {
+  color: #d83b3b;
+}
+
+.customRow {
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: -15px;
+  margin-left: -15px;
+}
+
+.customCol {
+  flex: 1;
+  padding-right: 1px;
+  padding-left: 1px;
+  max-width: 50%;
+}
+
 .formcontrol {
   width: 60%;
   padding: 8px;
@@ -65,4 +83,14 @@ button[type="submit"] {
   &:hover {
     background-color: #0056b3;
   }
+}
+
+.centereddiv {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 60vh;
+  font-weight: 500;
+  font-size: 18px;
+  text-align: center;
 }

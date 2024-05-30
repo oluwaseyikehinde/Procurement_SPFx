@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as moment from 'moment';
 import { IAllRequestFormFields } from './IAllRequestFields';
 import { IWebPartProps } from "../IProcurementProps";
 import { getListItems } from '../utils/sp.utils';
@@ -7,6 +8,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.min.js';
 import toast from 'react-hot-toast';
 import { listNames } from '../utils/models.utils';
+import Loader from '../loader/Loader';
 
 
 interface ListItem extends IAllRequestFormFields {
@@ -15,13 +17,17 @@ interface ListItem extends IAllRequestFormFields {
 
 interface AllRecordsTableState {
     records: ListItem[];
+    loading: boolean;
+    error: string | null;
 }
 
 export class AllRecordsTable extends React.Component<IWebPartProps, AllRecordsTableState> {
     constructor(props: IWebPartProps) {
         super(props);
         this.state = {
-            records: []
+            records: [],
+            loading: true,
+            error: null
         };
     }
 
@@ -31,14 +37,28 @@ export class AllRecordsTable extends React.Component<IWebPartProps, AllRecordsTa
             const listItems: IAllRequestFormFields[] = await getListItems(this.props.context, listNames.request);
             // Transform list items to include an id property
             const recordsWithId = listItems.map((item, index) => ({ ...item, id: index + 1 }));
-            this.setState({ records: recordsWithId });
+            this.setState({ records: recordsWithId, loading: false });
         } catch (error) {
+            this.setState({ error: 'Failed to load records', loading: false });
             toast.error('Failed to retrieve your procurement request(s). ', error);
         }
     }
 
     render() {
-        const { records } = this.state;
+        const { records, loading, error } = this.state;
+
+        if (loading) {
+            return <Loader />;
+        }
+
+        if (error) {
+            return <div className={styles.centereddiv}>Error: {error}</div>;
+        }
+
+        if (records.length === 0) {
+            return <div className={styles.centereddiv}>No records found</div>;
+        }
+
 
         return (
             <div className={styles.maincontainer}>
@@ -61,7 +81,7 @@ export class AllRecordsTable extends React.Component<IWebPartProps, AllRecordsTa
                                     <td>{record.id}</td>
                                     <td>{record.Initiator}</td>
                                     <td>{record.Department}</td>
-                                    <td>{record.DeliveryDate}</td>
+                                    <td>{moment(record.DeliveryDate).format('DD-MMM-YYYY')}</td>
                                     <td>{record.Supplier}</td>
                                 </tr>
                             ))}

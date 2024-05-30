@@ -26,8 +26,11 @@ export class NewRequestForm extends React.Component<IWebPartProps, NewRequestFor
             formData: {
                 Initiator: '',
                 Department: '',
+                Email: '',
                 DeliveryDate: '',
-                Supplier: ''
+                Supplier: '',
+                ApprovalStatus: '',
+                ApprovalStage: ''
             },
             gridRows: [{ Id: 1, Description: '', UnitPrice: 0, Quantity: 0, TotalPrice: 0 }],
             supplierOptions: []
@@ -43,15 +46,16 @@ export class NewRequestForm extends React.Component<IWebPartProps, NewRequestFor
             // Fetch Current User
             const currentUser = await getLoggedInUserData(this.props.context);
 
-            console.log("eeeeeeeeeeeeeeeeeeeeee", currentUser)
-
             // Update state
             this.setState({
                 supplierOptions,
                 formData: {
                     ...this.state.formData,
                     Initiator: currentUser.displayName || '',
-                    Department: currentUser.department || ''
+                    Department: currentUser.department || '',
+                    Email: currentUser.mail || '',
+                    ApprovalStatus: "Pending",
+                    ApprovalStage: "1"
                 }
             });
         } catch (error) {
@@ -115,8 +119,11 @@ export class NewRequestForm extends React.Component<IWebPartProps, NewRequestFor
                 formData: {
                     Initiator: '',
                     Department: '',
+                    Email: '',
                     DeliveryDate: '',
-                    Supplier: ''
+                    Supplier: '',
+                    ApprovalStatus: '',
+                    ApprovalStage: ''
                 },
                 gridRows: [{ Id: 1, Description: '', UnitPrice: 0, Quantity: 0, TotalPrice: 0 }]
             });
@@ -135,22 +142,22 @@ export class NewRequestForm extends React.Component<IWebPartProps, NewRequestFor
                 <hr />
                 <div className={styles.sectioncontainer}>
                     <form onSubmit={this.handleSubmit}>
-                        <div className="row">
-                            <div className='col'>
+                        <div className={styles.customRow}>
+                            <div className={styles.customCol}>
                                 <label>Initiator <span className={styles.labeltag}>. . . . . . . . . . </span></label>
                                 <input className={styles.formcontrol} type="text" name="Initiator" value={Initiator} onChange={this.handleInputChange} disabled />
                             </div>
-                            <div className='col'>
+                            <div className={styles.customCol}>
                                 <label>Department <span className={styles.labeltag}>. . . . . . </span></label>
                                 <input className={styles.formcontrol} type="text" name="Department" value={Department} onChange={this.handleInputChange} disabled />
                             </div>
                         </div>
-                        <div className="row">
-                            <div className='col'>
+                        <div className={styles.customRow}>
+                            <div className={styles.customCol}>
                                 <label>Delivery Date <span className={styles.labeltag}>. . . . . </span></label>
                                 <input className={styles.formcontrol} type="date" name="DeliveryDate" value={DeliveryDate} onChange={this.handleInputChange} />
                             </div>
-                            <div className='col'>
+                            <div className={styles.customCol}>
                                 <label>Supplier <span className={styles.labeltag}> . . . . . . . . . </span></label>
                                 {/* <input className={styles.formcontrol} type="text" name="Supplier" value={Supplier} onChange={this.handleInputChange} /> */}
                                 <select className={styles.formcontrol} name="Supplier" value={Supplier} onChange={this.handleInputChange}>

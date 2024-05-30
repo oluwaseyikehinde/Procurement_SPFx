@@ -1,6 +1,7 @@
 import * as React from 'react';
 import styles from '../Procurement.module.scss';
 import navstyles from '../SideNavigation/SideNavigation.module.scss';
+import { Icon } from 'office-ui-fabric-react/lib/Icon';
 import { NewRequestForm } from './NewRequestForm';
 import { RecordsTable } from './ViewRequest';
 import { IWebPartProps } from "../IProcurementProps";
@@ -27,8 +28,18 @@ export class Request extends React.Component<IWebPartProps, RequestState> {
         return (
             <div className={styles.maincontainer}>
                 <div className={navstyles.subnavcontainer}>
-                    <button className={navstyles.subnav} onClick={() => this.toggleView('new')}>New</button>
-                    <button className={navstyles.subnav} onClick={() => this.toggleView('view')}>View</button>
+                    <div className={navstyles.subnavitem}>
+                        <button className={navstyles.subnav} onClick={() => this.toggleView('new')}>
+                            <Icon iconName="Add" className={navstyles.icon} />
+                            New
+                        </button>
+                    </div>
+                    <div className={navstyles.subnavitem}>
+                        <button className={navstyles.subnav} onClick={() => this.toggleView('view')}>
+                            <Icon iconName="View" className={navstyles.icon} />
+                            View
+                        </button>
+                    </div>
                 </div>
                 {activeScreen === 'new' ? <NewRequestForm context={this.props.context} /> : <RecordsTable context={this.props.context} />}
             </div>

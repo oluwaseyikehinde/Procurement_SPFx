@@ -63,22 +63,22 @@ export class NewSupplierForm extends React.Component<IWebPartProps, NewSupplierF
                 <hr />
                 <div className={styles.sectioncontainer}>
                     <form onSubmit={this.handleSubmit}>
-                        <div className="row">
-                            <div className='col'>
+                        <div className={styles.customRow}>
+                            <div className={styles.customCol}>
                                 <label>Business Name <span className={styles.labeltag}>. . . . </span></label>
                                 <input className={styles.formcontrol} type="text" name="BusinessName" value={BusinessName} onChange={this.handleInputChange} />
                             </div>
-                            <div className='col'>
+                            <div className={styles.customCol}>
                                 <label>Contact Name <span className={styles.labeltag}>. . . . </span></label>
                                 <input className={styles.formcontrol} type="text" name="ContactName" value={ContactName} onChange={this.handleInputChange} />
                             </div>
                         </div>
-                        <div className="row">
-                            <div className='col'>
+                        <div className={styles.customRow}>
+                            <div className={styles.customCol}>
                                 <label>Contact Phone <span className={styles.labeltag}>. . . . </span></label>
                                 <input className={styles.formcontrol} type="text" name="ContactPhone" value={ContactPhone} onChange={this.handleInputChange} />
                             </div>
-                            <div className='col'>
+                            <div className={styles.customCol}>
                                 <label>Email <span className={styles.labeltag}> . . . . . . . . . . . . </span></label>
                                 <input className={styles.formcontrol} type="text" name="Email" value={Email} onChange={this.handleInputChange} />
                             </div>

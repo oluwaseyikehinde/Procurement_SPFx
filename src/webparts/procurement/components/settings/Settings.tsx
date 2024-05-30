@@ -28,9 +28,9 @@ export class Settings extends React.Component<IWebPartProps, SettingsState> {
         return (
             <div className={styles.maincontainer}>
                 <div className={navstyles.subnavcontainer}>
-                    <button className={navstyles.subnav} onClick={() => this.toggleView('supplier')}>Supplier</button>
-                    <button className={navstyles.subnav} onClick={() => this.toggleView('role')}>Role</button>
-                    <button className={navstyles.subnav} onClick={() => this.toggleView('approver')}>Approver</button>
+                    <button className={`${navstyles.subnav} ${activeScreen === 'supplier' ? navstyles.active : ''}`} onClick={() => this.toggleView('supplier')}>Supplier</button>
+                    <button className={`${navstyles.subnav} ${activeScreen === 'role' ? navstyles.active : ''}`} onClick={() => this.toggleView('role')}>Role</button>
+                    <button className={`${navstyles.subnav} ${activeScreen === 'approver' ? navstyles.active : ''}`} onClick={() => this.toggleView('approver')}>Approver</button>
                 </div>
                 {activeScreen === 'supplier' && <Supplier context={this.props.context} />}
                 {activeScreen === 'role' && <Role context={this.props.context} />}

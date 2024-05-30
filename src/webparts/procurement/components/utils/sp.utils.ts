@@ -2,15 +2,23 @@ import { SPFx as spSPFx, spfi } from "@pnp/sp";
 import "@pnp/sp/webs";
 import "@pnp/sp/lists";
 import "@pnp/sp/items";
+import { getLoggedInUserData } from "./graph.utils";
 
 export const getSPClient = (context: any) => {
     return spfi().using(spSPFx(context));
 }
 
+
 export const getMyRequestListItems = async (context: any, listName: string) => {
     try {
         const sp = spfi().using(spSPFx(context));
-        const items = await sp.web.lists.getByTitle(listName).items();
+
+        // Get the current user's data
+        const currentUser = await getLoggedInUserData(context);
+        const userEmail = currentUser.mail;
+
+        // Fetch list items filtered by the current user's email
+        const items = await sp.web.lists.getByTitle(listName).items.filter(`Email eq '${userEmail}'`)();
         return items;
     } catch (error) {
         console.error('Error getting list items:', error);
@@ -21,10 +29,10 @@ export const getMyRequestListItems = async (context: any, listName: string) => {
 export const createMyRequestListItem = async (context: any, listName: string, listItemName: string, itemProperties: any) => {
     try {
         const sp = spfi().using(spSPFx(context));
-        const { Initiator, Department, DeliveryDate, Supplier } = itemProperties;
+        const { Initiator, Department, DeliveryDate, Supplier, ApprovalStatus, ApprovalStage } = itemProperties;
 
         // Create a new object with the extracted properties
-        const formData = { Initiator, Department, DeliveryDate, Supplier };
+        const formData = { Initiator, Department, DeliveryDate, Supplier, ApprovalStatus, ApprovalStage };
         // Add the form data to the Procurement List
         const newItem = await sp.web.lists.getByTitle(listName).items.add(formData);
 

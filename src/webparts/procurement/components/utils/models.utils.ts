@@ -26,7 +26,7 @@ async function createProcurementTable(sp: any) {
         await list.fields.addText("DeliveryDate", { MaxLength: 255 });
         await list.fields.addText("Supplier", { MaxLength: 255 });
         await list.fields.addText("ApprovalStatus", { MaxLength: 255 });
-        await list.fields.addNumber("ApprovalStage");
+        await list.fields.addNumber("ApprovalStage", {MaxLength: 255});
     } catch (error) {
         console.log("An error occured.", error);
     }

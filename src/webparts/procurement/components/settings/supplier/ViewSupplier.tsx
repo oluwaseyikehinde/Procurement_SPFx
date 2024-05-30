@@ -7,6 +7,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.min.js';
 import toast from 'react-hot-toast';
 import { listNames } from '../../utils/models.utils';
+import Loader from '../../loader/Loader';
 
 
 interface ListItem extends INewSupplierFormFields {
@@ -15,13 +16,17 @@ interface ListItem extends INewSupplierFormFields {
 
 interface SuppliersTableState {
     records: ListItem[];
+    loading: boolean;
+    error: string | null;
 }
 
 export class SuppliersTable extends React.Component<IWebPartProps, SuppliersTableState> {
     constructor(props: IWebPartProps) {
         super(props);
         this.state = {
-            records: []
+            records: [],
+            loading: true,
+            error: null
         };
     }
 
@@ -31,14 +36,28 @@ export class SuppliersTable extends React.Component<IWebPartProps, SuppliersTabl
             const listItems: INewSupplierFormFields[] = await getListItems(this.props.context, listNames.suppliers);
             // Transform list items to include an id property
             const recordsWithId = listItems.map((item, index) => ({ ...item, id: index + 1 }));
-            this.setState({ records: recordsWithId });
+            this.setState({ records: recordsWithId, loading: false });
         } catch (error) {
+            this.setState({ error: 'Failed to load records', loading: false });
             toast.error('Failed to retrieve your supplier request(s). ', error);
         }
     }
 
     render() {
-        const { records } = this.state;
+        const { records, loading, error } = this.state;
+
+        if (loading) {
+            return <Loader />;
+        }
+
+        if (error) {
+            return <div className={styles.centereddiv}>Error: {error}</div>;
+        }
+
+        if (records.length === 0) {
+            return <div className={styles.centereddiv}>No records found</div>;
+        }
+
 
         return (
             <div className={styles.maincontainer}>

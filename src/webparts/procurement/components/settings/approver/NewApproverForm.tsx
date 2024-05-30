@@ -84,10 +84,9 @@ export class NewApproverForm extends React.Component<IWebPartProps, NewApproverF
                 <hr />
                 <div className={styles.sectioncontainer}>
                     <form onSubmit={this.handleSubmit}>
-                        <div className="row">
-                            <div className='col'>
+                        <div className={styles.customRow}>
+                            <div className={styles.customCol}>
                                 <label>Personnel <span className={styles.labeltag}>. . . . . . . .</span></label>
-                                {/* <input className={styles.formcontrol} type="text" name="Personnel" value={Personnel} onChange={this.handleInputChange} /> */}
                                 <select className={styles.formcontrol} name="Personnel" value={Personnel} onChange={this.handleInputChange}>
                                     <option value="">Select Personnel</option>
                                     {this.state.allUsers.map(user => (
@@ -95,7 +94,7 @@ export class NewApproverForm extends React.Component<IWebPartProps, NewApproverF
                                     ))}
                                 </select>
                             </div>
-                            <div className='col'>
+                            <div className={styles.customCol}>
                                 <label>Role <span className={styles.labeltag}> . . . . . . . . . . . . . </span></label>
                                 <select className={styles.formcontrol} name="Role" value={Role} onChange={this.handleInputChange}>
                                     <option value="">Select Role</option>
@@ -107,12 +106,12 @@ export class NewApproverForm extends React.Component<IWebPartProps, NewApproverF
                                 </select>
                             </div>
                         </div>
-                        <div className="row">
-                            <div className='col'>
+                        <div className={styles.customRow}>
+                            <div className={styles.customCol}>
                                 <label>Level <span className={styles.labeltag}>. . . . . . . . . . . .</span></label>
                                 <input className={styles.formcontrol} type="text" name="Level" value={Level} onChange={this.handleInputChange} />
                             </div>
-                            <div className='col'>
+                            <div className={styles.customCol}>
                                 <label>Email <span className={styles.labeltag}> . . . . . . . . . . . . </span></label>
                                 <input className={styles.formcontrol} type="text" name="Email" value={Email} onChange={this.handleInputChange} />
                             </div>

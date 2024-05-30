@@ -59,13 +59,13 @@ export class NewRoleForm extends React.Component<IWebPartProps, NewRoleFormState
                 <hr />
                 <div className={styles.sectioncontainer}>
                     <form onSubmit={this.handleSubmit}>
-                        <div className="row">
-                            <div className='col'>
+                        <div className={styles.customRow}>
+                            <div className={styles.customCol}>
                                 <label>Role <span className={styles.labeltag}> . . . . . . . . . . . . . </span></label>
                                 <input className={styles.formcontrol} type="text" name="Role" value={Role} onChange={this.handleInputChange} />
                             </div>
-                            <div className='col'>
-                                <label>Description <span className={styles.labeltag}> . . . . . </span></label>
+                            <div className={styles.customCol}>
+                                <label>Description <span className={styles.labeltag}> . . . . . . . </span></label>
                                 <input className={styles.formcontrol} type="text" name="Description" value={Description} onChange={this.handleInputChange} />
                             </div>
                         </div>
