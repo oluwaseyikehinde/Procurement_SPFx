@@ -5,9 +5,10 @@ import { IWebPartProps } from "../IProcurementProps";
 import { Role } from './role/Role';
 import { Supplier } from './supplier/Supplier';
 import { Approver } from './approver/Approver';
+import { Item } from './item/Item';
 
 interface SettingsState {
-    activeScreen: 'supplier' | 'role' | 'approver';
+    activeScreen: 'supplier' | 'role' | 'approver' | 'item';
 }
 
 export class Settings extends React.Component<IWebPartProps, SettingsState> {
@@ -18,7 +19,7 @@ export class Settings extends React.Component<IWebPartProps, SettingsState> {
         };
     }
 
-    toggleView = (activeScreen: 'supplier' | 'role' | 'approver') => {
+    toggleView = (activeScreen: 'supplier' | 'item' | 'role' | 'approver') => {
         this.setState({ activeScreen });
     };
 
@@ -29,10 +30,12 @@ export class Settings extends React.Component<IWebPartProps, SettingsState> {
             <div className={styles.maincontainer}>
                 <div className={navstyles.subnavcontainer}>
                     <button className={`${navstyles.subnav} ${activeScreen === 'supplier' ? navstyles.active : ''}`} onClick={() => this.toggleView('supplier')}>Supplier</button>
+                    <button className={`${navstyles.subnav} ${activeScreen === 'item' ? navstyles.active : ''}`} onClick={() => this.toggleView('item')}>Item</button>
                     <button className={`${navstyles.subnav} ${activeScreen === 'role' ? navstyles.active : ''}`} onClick={() => this.toggleView('role')}>Role</button>
                     <button className={`${navstyles.subnav} ${activeScreen === 'approver' ? navstyles.active : ''}`} onClick={() => this.toggleView('approver')}>Approver</button>
                 </div>
                 {activeScreen === 'supplier' && <Supplier context={this.props.context} />}
+                {activeScreen === 'item' && <Item context={this.props.context} />}
                 {activeScreen === 'role' && <Role context={this.props.context} />}
                 {activeScreen === 'approver' && <Approver context={this.props.context} />}
             </div>

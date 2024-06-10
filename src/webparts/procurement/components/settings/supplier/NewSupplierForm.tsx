@@ -58,29 +58,29 @@ export class NewSupplierForm extends React.Component<IWebPartProps, NewSupplierF
         const { BusinessName, ContactName, ContactPhone, Email } = this.state.formData;
 
         return (
-            <div className={styles.maincontainer}>
+            <div>
                 <h6 className={styles.mainheader}>New Supplier</h6>
                 <hr />
                 <div className={styles.sectioncontainer}>
                     <form onSubmit={this.handleSubmit}>
                         <div className={styles.customRow}>
                             <div className={styles.customCol}>
-                                <label>Business Name <span className={styles.labeltag}>. . . . </span></label>
-                                <input className={styles.formcontrol} type="text" name="BusinessName" value={BusinessName} onChange={this.handleInputChange} />
+                                <label>Business Name <span className={styles.labeltag}>. . . </span></label>
+                                <input className={styles.formcontrol} type="text" name="BusinessName" value={BusinessName} placeholder='Enter Business Name' onChange={this.handleInputChange} />
                             </div>
                             <div className={styles.customCol}>
                                 <label>Contact Name <span className={styles.labeltag}>. . . . </span></label>
-                                <input className={styles.formcontrol} type="text" name="ContactName" value={ContactName} onChange={this.handleInputChange} />
+                                <input className={styles.formcontrol} type="text" name="ContactName" value={ContactName} placeholder='Enter Contact Name' onChange={this.handleInputChange} />
                             </div>
                         </div>
                         <div className={styles.customRow}>
                             <div className={styles.customCol}>
                                 <label>Contact Phone <span className={styles.labeltag}>. . . . </span></label>
-                                <input className={styles.formcontrol} type="text" name="ContactPhone" value={ContactPhone} onChange={this.handleInputChange} />
+                                <input className={styles.formcontrol} type="text" name="ContactPhone" value={ContactPhone} placeholder='Enter Contact Phone' onChange={this.handleInputChange} />
                             </div>
                             <div className={styles.customCol}>
                                 <label>Email <span className={styles.labeltag}> . . . . . . . . . . . . </span></label>
-                                <input className={styles.formcontrol} type="text" name="Email" value={Email} onChange={this.handleInputChange} />
+                                <input className={styles.formcontrol} type="text" name="Email" value={Email} placeholder='Enter Email' onChange={this.handleInputChange} />
                             </div>
                         </div>
                         <div className={styles.buttoncontainer}>

@@ -54,7 +54,7 @@ export class NewRoleForm extends React.Component<IWebPartProps, NewRoleFormState
         const { Role, Description } = this.state.formData;
 
         return (
-            <div className={styles.maincontainer}>
+            <div>
                 <h6 className={styles.mainheader}>New Role</h6>
                 <hr />
                 <div className={styles.sectioncontainer}>
@@ -62,11 +62,11 @@ export class NewRoleForm extends React.Component<IWebPartProps, NewRoleFormState
                         <div className={styles.customRow}>
                             <div className={styles.customCol}>
                                 <label>Role <span className={styles.labeltag}> . . . . . . . . . . . . . </span></label>
-                                <input className={styles.formcontrol} type="text" name="Role" value={Role} onChange={this.handleInputChange} />
+                                <input className={styles.formcontrol} type="text" name="Role" value={Role} placeholder='Enter Role' onChange={this.handleInputChange} />
                             </div>
                             <div className={styles.customCol}>
                                 <label>Description <span className={styles.labeltag}> . . . . . . . </span></label>
-                                <input className={styles.formcontrol} type="text" name="Description" value={Description} onChange={this.handleInputChange} />
+                                <input className={styles.formcontrol} type="text" name="Description" value={Description} placeholder='Enter Description' onChange={this.handleInputChange} />
                             </div>
                         </div>
                         <div className={styles.buttoncontainer}>

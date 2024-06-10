@@ -27,24 +27,22 @@ export class NewRequestForm extends React.Component<IWebPartProps, NewRequestFor
                 Initiator: '',
                 Department: '',
                 Email: '',
-                DeliveryDate: '',
-                Supplier: '',
                 ApprovalStatus: '',
-                ApprovalStage: ''
+                ApprovalStage: '',
+                Created: '',
             },
-            gridRows: [{ Id: 1, Description: '', UnitPrice: 0, Quantity: 0, TotalPrice: 0 }],
-            supplierOptions: []
+            gridRows: [{ Id: 1, Supplier: '', Item: '', DeliveryDate: '', UnitPrice: 0, Quantity: 0, TotalPrice: 0 }],
+              supplierOptions: []
         };
     }
 
     async componentDidMount() {
         try {
+             // Fetch Current User
+            const currentUser = await getLoggedInUserData(this.props.context);
             // Fetch Supplier List
             const suppliers = await getListItems(this.props.context, listNames.suppliers);
             const supplierOptions = suppliers.map((supplier: any) => ({ ID: supplier.ID, BusinessName: supplier.BusinessName }));
-
-            // Fetch Current User
-            const currentUser = await getLoggedInUserData(this.props.context);
 
             // Update state
             this.setState({
@@ -81,7 +79,7 @@ export class NewRequestForm extends React.Component<IWebPartProps, NewRequestFor
 
     handleGridAddRow = () => {
         const Id = this.generateUniqueId();
-        const newRow: IGridRow = { Id: Id, Description: '', UnitPrice: 0, Quantity: 0, TotalPrice: 0 };
+        const newRow: IGridRow = { Id: Id, Supplier: '', Item: '', DeliveryDate: '', UnitPrice: 0, Quantity: 0, TotalPrice: 0 };
         this.setState(prevState => ({
             gridRows: [...prevState.gridRows, newRow]
         }));
@@ -106,6 +104,7 @@ export class NewRequestForm extends React.Component<IWebPartProps, NewRequestFor
         }));
     };
 
+
     handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         try {
@@ -115,17 +114,18 @@ export class NewRequestForm extends React.Component<IWebPartProps, NewRequestFor
             };
 
             await createMyRequestListItem(this.props.context, listNames.request, listNames.requestItem, requestData);
+            // Fetch Current User
+            const currentUser = await getLoggedInUserData(this.props.context);
             this.setState({
                 formData: {
-                    Initiator: '',
-                    Department: '',
+                    Initiator: currentUser.displayName || '',
+                    Department: currentUser.department || '',
                     Email: '',
-                    DeliveryDate: '',
-                    Supplier: '',
                     ApprovalStatus: '',
-                    ApprovalStage: ''
+                    ApprovalStage: '',
+                    Created: '',
                 },
-                gridRows: [{ Id: 1, Description: '', UnitPrice: 0, Quantity: 0, TotalPrice: 0 }]
+                gridRows: [{ Id: 1, Supplier: '', Item: '', DeliveryDate: '', UnitPrice: 0, Quantity: 0, TotalPrice: 0 }]
             });
             toast.success('Procurement submitted successfully!');
         } catch (error) {
@@ -134,10 +134,10 @@ export class NewRequestForm extends React.Component<IWebPartProps, NewRequestFor
     };
 
     render() {
-        const { Initiator, Department, DeliveryDate, Supplier } = this.state.formData;
+        const { Initiator, Department} = this.state.formData;
 
         return (
-            <div className={styles.maincontainer}>
+            <div>
                 <h6 className={styles.mainheader}>New Request</h6>
                 <hr />
                 <div className={styles.sectioncontainer}>
@@ -152,29 +152,13 @@ export class NewRequestForm extends React.Component<IWebPartProps, NewRequestFor
                                 <input className={styles.formcontrol} type="text" name="Department" value={Department} onChange={this.handleInputChange} disabled />
                             </div>
                         </div>
-                        <div className={styles.customRow}>
-                            <div className={styles.customCol}>
-                                <label>Delivery Date <span className={styles.labeltag}>. . . . . </span></label>
-                                <input className={styles.formcontrol} type="date" name="DeliveryDate" value={DeliveryDate} onChange={this.handleInputChange} />
-                            </div>
-                            <div className={styles.customCol}>
-                                <label>Supplier <span className={styles.labeltag}> . . . . . . . . . </span></label>
-                                {/* <input className={styles.formcontrol} type="text" name="Supplier" value={Supplier} onChange={this.handleInputChange} /> */}
-                                <select className={styles.formcontrol} name="Supplier" value={Supplier} onChange={this.handleInputChange}>
-                                    <option value="">Select Supplier</option>
-                                    {this.state.supplierOptions.map(option => (
-                                        <option key={option.ID} value={option.BusinessName}>
-                                            {option.BusinessName}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
                         <EditableGrid
                             rows={this.state.gridRows}
+                            suppliers={this.state.supplierOptions.map(option => option.BusinessName)}
                             onAddRow={this.handleGridAddRow}
                             onDeleteRow={this.handleGridDeleteRow}
                             onChangeRow={this.handleGridChangeRow}
+                            context={this.props.context}
                         />
                         <div className={styles.buttoncontainer}>
                             <button type="submit">Submit</button>

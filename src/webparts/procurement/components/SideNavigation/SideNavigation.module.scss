@@ -21,6 +21,10 @@
     color: #6c757d;
     font-weight: 500;
     transition: box-shadow .2s;
+    &:hover {
+        color: #000;
+        font-weight: bold;
+    }
 }
 
 .active {
@@ -55,7 +59,7 @@
     font-size: 12px;
     transition: background-color 0.3s ease;
     &:hover {
-        background-color: #3498db;
+        color: #3498db;
     }
 }
 

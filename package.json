@@ -27,6 +27,7 @@
     "@pnp/logging": "^4.0.1",
     "@pnp/queryable": "^4.0.1",
     "@pnp/sp": "^4.0.1",
+    "@pnp/spfx-controls-react": "^3.18.1",
     "@types/bootstrap": "^5.2.10",
     "@types/react-bootstrap": "^0.32.36",
     "@types/react-bootstrap-table-next": "^4.0.26",

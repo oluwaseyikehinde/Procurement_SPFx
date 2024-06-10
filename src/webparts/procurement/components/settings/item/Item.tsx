@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { IWebPartProps } from "../../IProcurementProps";
-import { NewRoleForm } from './NewRoleForm';
-import { RolesTable } from './ViewRole';
+import { NewItemForm } from './NewItemForm';
+import { ItemsTable } from './ViewItem';
 
 
-export class Role extends React.Component<IWebPartProps, {}> {
+export class Item extends React.Component<IWebPartProps, {}> {
     constructor(props: IWebPartProps) {
         super(props);
     }
@@ -13,9 +13,9 @@ export class Role extends React.Component<IWebPartProps, {}> {
 
         return (
             <div>
-                <NewRoleForm context={this.props.context} />
+                <NewItemForm context={this.props.context} />
                 <hr />
-                <RolesTable context={this.props.context} />
+                <ItemsTable context={this.props.context} />
             </div>
         );
     }

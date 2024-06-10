@@ -3,6 +3,7 @@
 .maincontainer {
   padding: 10px;
   background: #f2f2f2;
+  height: 70dvh !important;
 }
 
 .mainheader {
@@ -24,22 +25,58 @@ label {
   font-weight: 400;
 }
 
+
 .tableform {
   border-radius: 0;
   font-size: 10px;
   border: 1px solid #ccc;
   background: #fff;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.editableTable {
+
+  th,
+  td {
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+
+  th {
+    font-size: 10px;
+  }
+
+  select,
+  input {
+    width: 100%;
+  }
+}
+
+.rightAlign {
+  border-radius: 0;
+  font-size: 10px;
+  border: 1px solid #ccc;
+  background: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: right;
 }
 
 .tableicon {
   color: #d83b3b;
+  cursor: pointer;
 }
 
 .customRow {
   display: flex;
   flex-wrap: wrap;
-  margin-right: -15px;
-  margin-left: -15px;
+  // margin-right: -15px;
+  // margin-left: -15px;
 }
 
 .customCol {
@@ -47,6 +84,19 @@ label {
   padding-right: 1px;
   padding-left: 1px;
   max-width: 50%;
+}
+
+.customColWithPicker {
+  display: flex;
+  max-width: 50%;
+}
+
+.customColWithPicker label {
+  margin-right: 5px;
+}
+
+.customColWithPicker .ms-PeoplePicker {
+  flex-grow: 1;
 }
 
 .formcontrol {
@@ -65,13 +115,14 @@ label {
 }
 
 .buttoncontainer {
-    display: flex;
-    justify-content: flex-end;
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
 }
 
 button[type="submit"] {
   width: 80px;
-  padding: 8px; 
+  padding: 8px;
   background-color: #3b72d8;
   color: #fff;
   border: none;
@@ -93,4 +144,117 @@ button[type="submit"] {
   font-weight: 500;
   font-size: 18px;
   text-align: center;
+}
+
+.overlay {
+  background-color: transparent;
+  display: flex;
+  justify-content: center;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  overflow: none;
+}
+
+.modal {
+  background-color: white;
+  padding: 20px;
+  display: grid;
+  grid-template-rows: 20px 1fr 40px;
+  border-radius: 8px;
+  margin: 5px 0%;
+  width: auto;
+  height: auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.closeButton {
+  background: none;
+  color: #d83b3b;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  float: right;
+}
+
+.modalRecord {
+  height: 40px;
+  margin-top: 10px;
+
+  p {
+    padding: 0px;
+    margin-bottom: 5px;
+  }
+}
+
+.trackerContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 30px;
+  height: auto;
+}
+
+.trackerStep {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.trackerCircle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 18px;
+  color: white;
+}
+
+.approved {
+  background-color: green;
+}
+
+.pending {
+  background-color: orange;
+}
+
+.notstarted {
+  background-color: grey;
+}
+
+.trackerDetails {
+  margin-left: 20px;
+  flex-grow: 1;
+}
+
+.trackerLine {
+  height: 100px;
+  width: 5px;
+  background-color: #6c757d;
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  top: 65%;
+}
+
+.commentSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.commentBox {
+  width: 100%;
+  height: 100px;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }

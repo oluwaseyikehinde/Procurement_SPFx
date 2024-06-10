@@ -9,6 +9,7 @@ import 'bootstrap/dist/js/bootstrap.min.js';
 import toast from 'react-hot-toast';
 import { listNames } from '../utils/models.utils';
 import Loader from '../loader/Loader';
+import ApprovalRecordDetailView from './ApprovalRecordDetailView'; // Import the new component
 
 interface ListItem extends IApprovalRequestFormFields {
     id: number;
@@ -18,6 +19,7 @@ interface ApprovalRecordsTableState {
     records: ListItem[];
     loading: boolean;
     error: string | null;
+    selectedRecord: ListItem | null;
 }
 
 export class ApprovalRecordsTable extends React.Component<IWebPartProps, ApprovalRecordsTableState> {
@@ -26,7 +28,8 @@ export class ApprovalRecordsTable extends React.Component<IWebPartProps, Approva
         this.state = {
             records: [],
             loading: true,
-            error: null
+            error: null,
+            selectedRecord: null
         };
     }
 
@@ -43,8 +46,16 @@ export class ApprovalRecordsTable extends React.Component<IWebPartProps, Approva
         }
     }
 
+    handleViewClick = (record: ListItem) => {
+        this.setState({ selectedRecord: record });
+    };
+
+    handleCloseDetailView = () => {
+        this.setState({ selectedRecord: null });
+    };
+
     render() {
-        const { records, loading, error } = this.state;
+        const { records, loading, error, selectedRecord } = this.state;
 
         if (loading) {
             return <Loader />;
@@ -58,7 +69,6 @@ export class ApprovalRecordsTable extends React.Component<IWebPartProps, Approva
             return <div className={styles.centereddiv}>No records found</div>;
         }
 
-
         return (
             <div className={styles.maincontainer}>
                 <h6 className={styles.mainheader}>Records Table</h6>
@@ -67,26 +77,39 @@ export class ApprovalRecordsTable extends React.Component<IWebPartProps, Approva
                     <table className="table table-striped">
                         <thead>
                             <tr>
-                                <th scope="col">ID</th>
                                 <th scope="col">Initiator</th>
                                 <th scope="col">Department</th>
-                                <th scope="col">Delivery Date</th>
-                                <th scope="col">Supplier</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Request Date</th>
+                                <th scope="col">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {records.map(record => (
                                 <tr key={record.id}>
-                                    <td>{record.id}</td>
                                     <td>{record.Initiator}</td>
                                     <td>{record.Department}</td>
-                                    <td>{moment(record.DeliveryDate).format('DD-MMM-YYYY')}</td>
-                                    <td>{record.Supplier}</td>
+                                    <td>{record.ApprovalStatus}</td>
+                                    <td>{moment(record.Created).format('DD-MMM-YYYY')}</td>
+                                    <td>
+                                        <button
+                                            onClick={() => this.handleViewClick(record)}
+                                        >
+                                            View
+                                        </button>
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
                 </div>
+                {selectedRecord && (
+                    <ApprovalRecordDetailView
+                        record={selectedRecord}
+                        onClose={this.handleCloseDetailView}
+                        context={this.props.context}
+                    />
+                )}
             </div>
         );
     }

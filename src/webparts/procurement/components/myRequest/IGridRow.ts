@@ -1,6 +1,8 @@
 export interface IGridRow {
     Id: number;
-    Description: string;
+    Supplier: string;
+    Item: string;
+    DeliveryDate: string;
     UnitPrice: number;
     Quantity: number;
     TotalPrice: number;

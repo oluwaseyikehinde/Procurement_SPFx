@@ -60,14 +60,13 @@ export class SuppliersTable extends React.Component<IWebPartProps, SuppliersTabl
 
 
         return (
-            <div className={styles.maincontainer}>
+            <div>
                 <h6 className={styles.mainheader}>Suppliers Table</h6>
                 <hr />
                 <div className={styles.sectioncontainer}>
                     <table className="table table-striped">
                         <thead>
                             <tr>
-                                <th scope="col">ID</th>
                                 <th scope="col">Business Name</th>
                                 <th scope="col">Contact Name</th>
                                 <th scope="col">Contact Phone</th>
@@ -77,7 +76,6 @@ export class SuppliersTable extends React.Component<IWebPartProps, SuppliersTabl
                         <tbody>
                             {records.map(record => (
                                 <tr key={record.id}>
-                                    <td>{record.id}</td>
                                     <td>{record.BusinessName}</td>
                                     <td>{record.ContactName}</td>
                                     <td>{record.ContactPhone}</td>

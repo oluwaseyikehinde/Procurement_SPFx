@@ -9,7 +9,7 @@ import 'bootstrap/dist/js/bootstrap.min.js';
 import toast from 'react-hot-toast';
 import { listNames } from '../utils/models.utils';
 import Loader from '../loader/Loader';
-
+import RecordDetailView from '../ViewRecord';
 
 interface ListItem extends IAllRequestFormFields {
     id: number;
@@ -19,6 +19,7 @@ interface AllRecordsTableState {
     records: ListItem[];
     loading: boolean;
     error: string | null;
+    selectedRecord: ListItem | null;
 }
 
 export class AllRecordsTable extends React.Component<IWebPartProps, AllRecordsTableState> {
@@ -27,7 +28,8 @@ export class AllRecordsTable extends React.Component<IWebPartProps, AllRecordsTa
         this.state = {
             records: [],
             loading: true,
-            error: null
+            error: null,
+            selectedRecord: null
         };
     }
 
@@ -44,8 +46,16 @@ export class AllRecordsTable extends React.Component<IWebPartProps, AllRecordsTa
         }
     }
 
+    handleViewClick = (record: ListItem) => {
+        this.setState({ selectedRecord: record });
+    };
+
+    handleCloseDetailView = () => {
+        this.setState({ selectedRecord: null });
+    };
+
     render() {
-        const { records, loading, error } = this.state;
+        const { records, loading, error, selectedRecord } = this.state;
 
         if (loading) {
             return <Loader />;
@@ -59,7 +69,6 @@ export class AllRecordsTable extends React.Component<IWebPartProps, AllRecordsTa
             return <div className={styles.centereddiv}>No records found</div>;
         }
 
-
         return (
             <div className={styles.maincontainer}>
                 <h6 className={styles.mainheader}>Records Table</h6>
@@ -68,26 +77,37 @@ export class AllRecordsTable extends React.Component<IWebPartProps, AllRecordsTa
                     <table className="table table-striped">
                         <thead>
                             <tr>
-                                <th scope="col">ID</th>
                                 <th scope="col">Initiator</th>
                                 <th scope="col">Department</th>
-                                <th scope="col">Delivery Date</th>
-                                <th scope="col">Supplier</th>
+                                <th>Status</th>
+                                <th scope="col">Request Date</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             {records.map(record => (
                                 <tr key={record.id}>
-                                    <td>{record.id}</td>
                                     <td>{record.Initiator}</td>
                                     <td>{record.Department}</td>
-                                    <td>{moment(record.DeliveryDate).format('DD-MMM-YYYY')}</td>
-                                    <td>{record.Supplier}</td>
+                                    <td>{record.ApprovalStatus}</td>
+                                    <td>{moment(record.Created).format('DD-MMM-YYYY')}</td>
+                                    <td>
+                                        <button onClick={() => this.handleViewClick(record)}>
+                                            View
+                                        </button>
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
                 </div>
+                {selectedRecord && (
+                    <RecordDetailView
+                        record={selectedRecord}
+                        onClose={this.handleCloseDetailView}
+                        context={this.props.context}
+                    />
+                )}
             </div>
         );
     }

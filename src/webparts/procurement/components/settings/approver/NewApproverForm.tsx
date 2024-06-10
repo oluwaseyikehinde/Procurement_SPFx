@@ -1,6 +1,5 @@
 import * as React from 'react';
-import {createListItem, getListItems } from '../../utils/sp.utils';
-import { getAllUsersInOrg } from '../../utils/graph.utils';
+import { createListItem, getListItems } from '../../utils/sp.utils';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.min.js';
 import styles from '../../Procurement.module.scss';
@@ -8,39 +7,39 @@ import { INewApproverFormFields } from './IApproverFields';
 import { IWebPartProps } from "../../IProcurementProps";
 import toast from 'react-hot-toast';
 import { listNames } from '../../utils/models.utils';
+import { PeoplePicker, PrincipalType, IPeoplePickerContext } from "@pnp/spfx-controls-react/lib/PeoplePicker";
+import { WebPartContext } from "@microsoft/sp-webpart-base";
 
 interface NewApproverFormState {
     formData: INewApproverFormFields;
     roleOptions: { ID: number; Role: string }[];
-    allUsers: { displayName: string; id: string }[];
 }
 
-export class NewApproverForm extends React.Component<IWebPartProps, NewApproverFormState> {
-    constructor(props: IWebPartProps) {
+interface NewApproverFormProps extends IWebPartProps {
+    context: WebPartContext;
+}
+
+export class NewApproverForm extends React.Component<NewApproverFormProps, NewApproverFormState> {
+    constructor(props: NewApproverFormProps) {
         super(props);
         this.state = {
             formData: {
                 Personnel: '',
                 Role: '',
-                Level: '',
+                Level: 0,
                 Email: ''
             },
-            roleOptions: [],
-            allUsers: []
+            roleOptions: []
         };
     }
 
     async componentDidMount() {
         try {
-            //Fetch Role List
+            // Fetch Role List
             const roles = await getListItems(this.props.context, listNames.roles);
             const roleOptions = roles.map((role: any) => ({ ID: role.ID, Role: role.Role }));
 
-            // Fetch All Users
-            const allUsers = await getAllUsersInOrg(this.props.context);
-            const userOptions = allUsers.map((user: any) => ({ displayName: user.displayName, id: user.id }));
-
-            this.setState({ roleOptions, allUsers: userOptions });
+            this.setState({ roleOptions });
 
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -57,15 +56,37 @@ export class NewApproverForm extends React.Component<IWebPartProps, NewApproverF
         }));
     };
 
+    handlePeoplePickerChange = (items: any[]) => {
+        if (items.length > 0) {
+            const selectedUser = items[0];
+            this.setState(prevState => ({
+                formData: {
+                    ...prevState.formData,
+                    Personnel: selectedUser.text,
+                    Email: selectedUser.secondaryText || ''
+                }
+            }));
+        } else {
+            this.setState(prevState => ({
+                formData: {
+                    ...prevState.formData,
+                    Personnel: '',
+                    Email: ''
+                }
+            }));
+        }
+    };
+
     handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         try {
-            await createListItem(this.props.context, listNames.approvers, this.state.formData);
+            const itemRequestData = JSON.parse(JSON.stringify(this.state.formData));
+            await createListItem(this.props.context, listNames.approvers, itemRequestData);
             this.setState({
                 formData: {
                     Personnel: '',
                     Role: '',
-                    Level: '',
+                    Level: 0,
                     Email: ''
                 }
             });
@@ -76,24 +97,21 @@ export class NewApproverForm extends React.Component<IWebPartProps, NewApproverF
     };
 
     render() {
-        const { Personnel, Role, Level, Email } = this.state.formData;
+        const { Role, Level } = this.state.formData;
+
+        const peoplePickerContext: IPeoplePickerContext = {
+            absoluteUrl: this.props.context.pageContext.web.absoluteUrl,
+            msGraphClientFactory: this.props.context.msGraphClientFactory,
+            spHttpClient: this.props.context.spHttpClient
+        };
 
         return (
-            <div className={styles.maincontainer}>
+            <div>
                 <h6 className={styles.mainheader}>New Approver</h6>
                 <hr />
                 <div className={styles.sectioncontainer}>
                     <form onSubmit={this.handleSubmit}>
                         <div className={styles.customRow}>
-                            <div className={styles.customCol}>
-                                <label>Personnel <span className={styles.labeltag}>. . . . . . . .</span></label>
-                                <select className={styles.formcontrol} name="Personnel" value={Personnel} onChange={this.handleInputChange}>
-                                    <option value="">Select Personnel</option>
-                                    {this.state.allUsers.map(user => (
-                                        <option key={user.id} value={user.displayName}>{user.displayName}</option>
-                                    ))}
-                                </select>
-                            </div>
                             <div className={styles.customCol}>
                                 <label>Role <span className={styles.labeltag}> . . . . . . . . . . . . . </span></label>
                                 <select className={styles.formcontrol} name="Role" value={Role} onChange={this.handleInputChange}>
@@ -105,17 +123,44 @@ export class NewApproverForm extends React.Component<IWebPartProps, NewApproverF
                                     ))}
                                 </select>
                             </div>
-                        </div>
-                        <div className={styles.customRow}>
                             <div className={styles.customCol}>
                                 <label>Level <span className={styles.labeltag}>. . . . . . . . . . . .</span></label>
                                 <input className={styles.formcontrol} type="text" name="Level" value={Level} onChange={this.handleInputChange} />
                             </div>
-                            <div className={styles.customCol}>
-                                <label>Email <span className={styles.labeltag}> . . . . . . . . . . . . </span></label>
-                                <input className={styles.formcontrol} type="text" name="Email" value={Email} onChange={this.handleInputChange} />
+                        </div>
+                        <div className={styles.customRow}>
+                            <div className={styles.customColWithPicker}>
+                                <label>Personnel <span className={styles.labeltag}>. . . . . . . .  </span></label>
+                                   <PeoplePicker
+                                            context={peoplePickerContext}
+                                            titleText=""
+                                            groupName={""}
+                                            personSelectionLimit={1}
+                                            showtooltip={true}
+                                            required={true}
+                                            placeholder='Search Personnel'
+                                            disabled={false}
+                                            onChange={this.handlePeoplePickerChange}
+                                            showHiddenInUI={false}
+                                            principalTypes={[PrincipalType.User]}
+                                            resolveDelay={1000}
+                                            styles={{
+                                                text: {
+                                                    width: '115%',
+                                                    height: '35px',
+                                                    padding: '0px',
+                                                    border: '1px solid #ccc',
+                                                    background: '#fff',
+                                                    borderRadius: '3px',
+                                                    fontSize: '12px',
+                                                    marginBottom: '20px',
+                                                    marginLeft: '0px'
+                                                }
+                                            }}
+                                        />
                             </div>
                         </div>
+
                         <div className={styles.buttoncontainer}>
                             <button type="submit">Submit</button>
                         </div>

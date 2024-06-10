@@ -60,14 +60,13 @@ export class ApproversTable extends React.Component<IWebPartProps, ApproversTabl
 
 
         return (
-            <div className={styles.maincontainer}>
+            <div>
                 <h6 className={styles.mainheader}>Approvers Table</h6>
                 <hr />
                 <div className={styles.sectioncontainer}>
                     <table className="table table-striped">
                         <thead>
                             <tr>
-                                <th scope="col">ID</th>
                                 <th scope="col">Personnel</th>
                                 <th scope="col">Role</th>
                                 <th scope="col">Level</th>
@@ -77,7 +76,6 @@ export class ApproversTable extends React.Component<IWebPartProps, ApproversTabl
                         <tbody>
                             {records.map(record => (
                                 <tr key={record.id}>
-                                    <td>{record.id}</td>
                                     <td>{record.Personnel}</td>
                                     <td>{record.Role}</td>
                                     <td>{record.Level}</td>

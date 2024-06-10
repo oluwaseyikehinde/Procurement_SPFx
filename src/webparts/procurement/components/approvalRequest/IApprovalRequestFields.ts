@@ -1,6 +1,6 @@
 export interface IApprovalRequestFormFields {
     Initiator: string;
     Department: string;
-    DeliveryDate: string;
-    Supplier: string;
+    ApprovalStatus: string;
+    Created: string;
 }
