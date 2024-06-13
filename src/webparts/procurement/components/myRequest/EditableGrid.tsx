@@ -16,13 +16,14 @@ interface EditableGridProps {
 
 const EditableGrid: React.FC<EditableGridProps> = ({ rows, suppliers, onAddRow, onDeleteRow, onChangeRow, context }) => {
     const [itemsBySupplier, setItemsBySupplier] = React.useState<{ [supplier: string]: string[] }>({});
-    const [itemPrices, setItemPrices] = React.useState<{ [item: string]: number }>({});
+    const [itemLists, setItemLists] = React.useState<{ [item: string]: { price: number, currency: string } }>({});
 
     React.useEffect(() => {
         const fetchItemsBySupplier = async (supplier: string) => {
             try {
                 const items = await getListItems(context, listNames.items);
-                const itemsForSupplier = items
+                const activeItems = items.filter(item => item.Status === 'Active');
+                const itemsForSupplier = activeItems
                     .filter(item => item.Supplier === supplier)
                     .map(item => item.Item);
 
@@ -31,12 +32,12 @@ const EditableGrid: React.FC<EditableGridProps> = ({ rows, suppliers, onAddRow, 
                     [supplier]: itemsForSupplier
                 }));
 
-                const prices: { [item: string]: number } = {};
+                const listItems: { [item: string]: { price: number, currency: string } } = {};
                 items.forEach(item => {
-                    prices[item.Item] = item.Price;
+                    listItems[item.Item] = { price: item.Price, currency: item.Currency };
                 });
 
-                setItemPrices(prices);
+                setItemLists(listItems);
             } catch (error) {
                 console.error('Error fetching items:', error);
             }
@@ -63,7 +64,8 @@ const EditableGrid: React.FC<EditableGridProps> = ({ rows, suppliers, onAddRow, 
     const handleItemChange = (id: number, item: string) => {
         const updatedRows = rows.map(row => {
             if (row.Id === id) {
-                return { ...row, Item: item, UnitPrice: itemPrices[item] || 0 };
+                const itemData = itemLists[item] || { price: 0, currency: '' };
+                return { ...row, Item: item, UnitPrice: itemData.price, Currency: itemData.currency };
             }
             return row;
         });
@@ -87,11 +89,11 @@ const EditableGrid: React.FC<EditableGridProps> = ({ rows, suppliers, onAddRow, 
     };
 
 
-    const formatCurrency = (value: number) => {
-        return value.toLocaleString('en-US', {
+    const formatCurrency = (value: number, currency: string) => {
+        return `${currency} ${value.toLocaleString('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2
-        });
+        })}`;
     };
 
     return (
@@ -136,10 +138,10 @@ const EditableGrid: React.FC<EditableGridProps> = ({ rows, suppliers, onAddRow, 
                                 <input className={styles.tableform} type="date" value={row.DeliveryDate} onChange={e => handleChange(row.Id, 'DeliveryDate', e.target.value)} />
                             </td>
                             <td className={styles.rightAlign}>
-                                {formatCurrency(itemPrices[row.Item] || 0)}
+                                {formatCurrency(row.UnitPrice, row.Currency)}
                             </td>
                             <td className={styles.rightAlign}>
-                                {formatCurrency((itemPrices[row.Item] || 0) * row.Quantity)}
+                                {formatCurrency(row.UnitPrice * row.Quantity, row.Currency)}
                             </td>
                             <td>
                                 <Icon iconName="Delete" className={styles.tableicon} onClick={() => onDeleteRow(row.Id)} />
@@ -148,7 +150,7 @@ const EditableGrid: React.FC<EditableGridProps> = ({ rows, suppliers, onAddRow, 
                     ))}
                 </tbody>
             </table>
-            <button type="button" onClick={onAddRow}>Add Row</button>
+            <button type="button" className={styles.addbutton} onClick={onAddRow}>Add Row</button>
         </div>
     );
 };

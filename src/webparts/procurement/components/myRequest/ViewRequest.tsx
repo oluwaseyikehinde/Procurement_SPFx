@@ -24,6 +24,8 @@ interface RecordsTableState {
     selectedRecord: ListItem | null;
     showView: boolean;
     showTracker: boolean;
+    currentPage: number;
+    itemsPerPage: number;
 }
 
 export class RecordsTable extends React.Component<IWebPartProps, RecordsTableState> {
@@ -35,7 +37,9 @@ export class RecordsTable extends React.Component<IWebPartProps, RecordsTableSta
             error: null,
             selectedRecord: null,
             showView: false,
-            showTracker: false
+            showTracker: false,
+            currentPage: 1,
+            itemsPerPage: 10
         };
     }
 
@@ -52,7 +56,10 @@ export class RecordsTable extends React.Component<IWebPartProps, RecordsTableSta
         }
     }
 
-
+    handleClick = (event: React.MouseEvent<HTMLAnchorElement>, number: number) => {
+        event.preventDefault();
+        this.setState({ currentPage: number });
+    };
 
     handleViewClick = (record: ListItem) => {
         this.setState({ selectedRecord: record, showTracker: false, showView:true });
@@ -71,7 +78,7 @@ export class RecordsTable extends React.Component<IWebPartProps, RecordsTableSta
     };
 
     render() {
-        const { records, loading, error, selectedRecord, showView, showTracker } = this.state;
+        const { records, loading, error, selectedRecord, showView, showTracker, currentPage, itemsPerPage } = this.state;
 
         if (loading) {
             return <Loader/>;
@@ -83,6 +90,17 @@ export class RecordsTable extends React.Component<IWebPartProps, RecordsTableSta
 
         if (records.length === 0) {
             return <div className={styles.centereddiv}>No records found</div>;
+        }
+
+        // Calculate the current records to display
+        const indexOfLastRecord = currentPage * itemsPerPage;
+        const indexOfFirstRecord = indexOfLastRecord - itemsPerPage;
+        const currentRecords = records.slice(indexOfFirstRecord, indexOfLastRecord);
+
+        // Calculate page numbers
+        const pageNumbers = [];
+        for (let i = 1; i <= Math.ceil(records.length / itemsPerPage); i++) {
+            pageNumbers.push(i);
         }
 
 
@@ -102,17 +120,17 @@ export class RecordsTable extends React.Component<IWebPartProps, RecordsTableSta
                             </tr>
                         </thead>
                         <tbody>
-                            {records.map(record => (
+                            {currentRecords.map(record => (
                                 <tr key={record.id}>
                                     <td>{record.Initiator}</td>
                                     <td>{record.Department}</td>
                                     <td>{record.ApprovalStatus}</td>
                                     <td>{moment(record.Created).format('DD-MMM-YYYY')}</td>
                                     <td>
-                                        <button onClick={() => this.handleViewClick(record)}>
+                                        <button className={styles.tablebutton} onClick={() => this.handleViewClick(record)}>
                                             View
                                         </button>
-                                        <button onClick={() => this.handleTrackerClick(record)}>
+                                        <button className={styles.tablebutton} onClick={() => this.handleTrackerClick(record)}>
                                             Tracker
                                         </button>
                                     </td>
@@ -120,6 +138,17 @@ export class RecordsTable extends React.Component<IWebPartProps, RecordsTableSta
                             ))}
                         </tbody>
                     </table>
+                    <nav>
+                        <ul className="pagination pagination-sm justify-content-center">
+                            {pageNumbers.map(number => (
+                                <li key={number} className={`page-item ${currentPage === number ? 'active' : ''}`}>
+                                    <a href="!#" className="page-link" onClick={(e) => this.handleClick(e, number)}>
+                                        {number}
+                                    </a>
+                                </li>
+                            ))}
+                        </ul>
+                    </nav>
                 </div>
                 {selectedRecord && showView &&  (
                     <RecordDetailView 

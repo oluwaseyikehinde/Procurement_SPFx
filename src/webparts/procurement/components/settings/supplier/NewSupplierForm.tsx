@@ -1,29 +1,32 @@
 import * as React from 'react';
-import { createListItem } from '../../utils/sp.utils';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.min.js';
 import styles from '../../Procurement.module.scss';
 import { INewSupplierFormFields } from './ISupplierFields';
 import { IWebPartProps } from "../../IProcurementProps";
-import toast from 'react-hot-toast';
-import { listNames } from '../../utils/models.utils';
 
-
-interface NewSupplierFormState {
-    formData: INewSupplierFormFields;
+interface NewSupplierFormProps extends IWebPartProps {
+    formData: INewSupplierFormFields & { id: number };
+    editing: boolean;
+    onSupplierSubmit: (formData: INewSupplierFormFields & { id: number }) => void;
 }
 
-export class NewSupplierForm extends React.Component<IWebPartProps, NewSupplierFormState> {
-    constructor(props: IWebPartProps) {
+interface NewSupplierFormState {
+    formData: INewSupplierFormFields & { id: number };
+}
+
+export class NewSupplierForm extends React.Component<NewSupplierFormProps, NewSupplierFormState> {
+    constructor(props: NewSupplierFormProps) {
         super(props);
         this.state = {
-            formData: {
-                BusinessName: '',
-                ContactName: '',
-                ContactPhone: '',
-                Email: ''
-            }
+            formData: this.props.formData
         };
+    }
+
+    componentDidUpdate(prevProps: NewSupplierFormProps) {
+        if (prevProps.formData !== this.props.formData) {
+            this.setState({ formData: this.props.formData });
+        }
     }
 
     handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -38,34 +41,31 @@ export class NewSupplierForm extends React.Component<IWebPartProps, NewSupplierF
 
     handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        try {
-            await createListItem(this.props.context, listNames.suppliers, this.state.formData);
-            this.setState({
-                formData: {
-                    BusinessName: '',
-                    ContactName: '',
-                    ContactPhone: '',
-                    Email: ''
-                }
-            });
-            toast.success('Supplier submitted successfully!');
-        } catch (error) {
-            toast.error('Failed to submit Supplier.', error);
-        }
+        this.props.onSupplierSubmit(this.state.formData);
+        this.setState({
+            formData: {
+                id: 0,
+                BusinessName: '',
+                ContactName: '',
+                ContactPhone: '',
+                Email: '',
+                Status: ''
+            }
+        });
     };
 
     render() {
-        const { BusinessName, ContactName, ContactPhone, Email } = this.state.formData;
+        const { BusinessName, ContactName, ContactPhone, Email, Status } = this.state.formData;
 
         return (
             <div>
-                <h6 className={styles.mainheader}>New Supplier</h6>
+                <h6 className={styles.mainheader}>{this.props.editing ? 'Edit Supplier' : 'New Supplier'}</h6>
                 <hr />
                 <div className={styles.sectioncontainer}>
                     <form onSubmit={this.handleSubmit}>
                         <div className={styles.customRow}>
                             <div className={styles.customCol}>
-                                <label>Business Name <span className={styles.labeltag}>. . . </span></label>
+                                <label>Business Name <span className={styles.labeltag}>. . . . </span></label>
                                 <input className={styles.formcontrol} type="text" name="BusinessName" value={BusinessName} placeholder='Enter Business Name' onChange={this.handleInputChange} />
                             </div>
                             <div className={styles.customCol}>
@@ -83,8 +83,19 @@ export class NewSupplierForm extends React.Component<IWebPartProps, NewSupplierF
                                 <input className={styles.formcontrol} type="text" name="Email" value={Email} placeholder='Enter Email' onChange={this.handleInputChange} />
                             </div>
                         </div>
+                        {this.props.editing && (
+                            <div className={styles.customRow}>
+                                <div className={styles.customCol}>
+                                    <label>Status <span className={styles.labeltag}>. . . . . . . . . . . . </span></label>
+                                    <select className={styles.formcontrol} name="Status" value={Status} onChange={this.handleInputChange}>
+                                        <option value="Active">Active</option>
+                                        <option value="Inactive">Inactive</option>
+                                    </select>
+                                </div>
+                            </div>
+                        )}
                         <div className={styles.buttoncontainer}>
-                            <button type="submit">Submit</button>
+                            <button type="submit">{this.props.editing ? 'Update' : 'Submit'}</button>
                         </div>
                     </form>
                 </div>

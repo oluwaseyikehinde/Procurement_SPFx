@@ -35,6 +35,7 @@ async function createProcurementRequestLineItemTable(sp: any) {
         await createField(list, "Text", "Supplier", { MaxLength: 255 });
         await createField(list, "Text", "Item", { MaxLength: 255 });
         await createField(list, "DateTime", "DeliveryDate");
+        await createField(list, "Text", "Currency", { MaxLength: 255 });
         await createField(list, "Number", "UnitPrice");
         await createField(list, "Number", "Quantity");
         await createField(list, "Number", "ProcurementId");
@@ -49,7 +50,9 @@ async function createProcurementItemTable(sp: any) {
         const list = sp.web.lists.getByTitle(listNames.items);
         await createField(list, "Text", "Supplier", { MaxLength: 255 });
         await createField(list, "Text", "Item", { MaxLength: 255 });
+        await createField(list, "Text", "Currency", { MaxLength: 255 });
         await createField(list, "Number", "Price");
+        await createField(list, "Text", "Status", { MaxLength: 255 });
     } catch (error) {
         console.error("Error creating Procurement Item List:", error);
     }
@@ -61,6 +64,7 @@ async function createRolesTable(sp: any) {
         const list = sp.web.lists.getByTitle(listNames.roles);
         await createField(list, "Text", "Role", { MaxLength: 255 });
         await createField(list, "Text", "Description", { MaxLength: 255 });
+        await createField(list, "Text", "Status", { MaxLength: 255 });
     } catch (error) {
         console.error("Error creating Procurement Role List:", error);
     }
@@ -74,6 +78,7 @@ async function createApproversTable(sp: any) {
         await createField(list, "Text", "Role", { MaxLength: 255 });
         await createField(list, "Number", "Level");
         await createField(list, "Text", "Email", { MaxLength: 255 });
+        await createField(list, "Text", "Status", { MaxLength: 255 });
     } catch (error) {
         console.error("Error creating Procurement Approver List:", error);
     }
@@ -87,6 +92,7 @@ async function createSuppliersTable(sp: any) {
         await createField(list, "Text", "ContactName", { MaxLength: 255 });
         await createField(list, "Text", "ContactPhone", { MaxLength: 255 });
         await createField(list, "Text", "Email", { MaxLength: 255 });
+        await createField(list, "Text", "Status", { MaxLength: 255 });
     } catch (error) {
         console.error("Error creating Procurement Supplier List:", error);
     }
@@ -103,6 +109,8 @@ async function createAuditLogTable(sp: any) {
         await createField(list, "Text", "InitiatorEmail", { MaxLength: 255 });
         await createField(list, "Text", "MoreInitiatorInfo", { MaxLength: 255 });
         await createField(list, "Text", "Information", { MaxLength: 255 });
+        await createField(list, "Text", "ListName", { MaxLength: 255 });
+        await createField(list, "DateTime", "ActionDate");
     } catch (error) {
         console.error("Error creating Procurement Audit Log:", error);
     }

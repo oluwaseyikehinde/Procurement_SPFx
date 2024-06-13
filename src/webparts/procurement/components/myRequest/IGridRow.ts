@@ -5,5 +5,6 @@ export interface IGridRow {
     DeliveryDate: string;
     UnitPrice: number;
     Quantity: number;
+    Currency: string;
     TotalPrice: number;
 }

@@ -35,11 +35,13 @@ class RecordDetailTracker extends React.Component<RecordDetailTrackerProps, Reco
     async componentDidMount() {
         try {
             const approvers = await getListItems(this.props.context, listNames.approvers);
-            this.setState({ approvers, loading: false });
+            const activeApprovers = approvers.filter(approver => approver.Status === 'Active');
+            this.setState({ approvers: activeApprovers, loading: false });
         } catch (error) {
             this.setState({ error: 'Failed to load approvers', loading: false });
         }
     }
+
 
     getStatus(level: number) {
         const { ApprovalStage } = this.props.record;

@@ -3,4 +3,5 @@ export interface INewSupplierFormFields {
     ContactName: string;
     ContactPhone: string;
     Email: string;
+    Status: string;
 }

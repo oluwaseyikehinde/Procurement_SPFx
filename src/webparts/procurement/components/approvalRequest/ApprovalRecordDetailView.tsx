@@ -124,8 +124,8 @@ class ApprovalRecordDetailView extends React.Component<RecordDetailViewProps, Re
                                                     <td>{item.Item}</td>
                                                     <td>{item.Quantity}</td>
                                                     <td>{moment(item.DeliveryDate).format('DD-MMM-YYYY')}</td>
-                                                    <td>{formatCurrency(item.UnitPrice)}</td>
-                                                    <td>{formatCurrency(item.Quantity * item.UnitPrice)}</td>
+                                                    <td>{item.Currency}{formatCurrency(item.UnitPrice)}</td>
+                                                    <td>{item.Currency}{formatCurrency(item.Quantity * item.UnitPrice)}</td>
                                                 </tr>
                                             ))}
                                         </tbody>
@@ -142,8 +142,8 @@ class ApprovalRecordDetailView extends React.Component<RecordDetailViewProps, Re
                             />
                         </div>
                             <div className={styles.buttoncontainer}>
-                                <button onClick={this.handleApprove} >Approve</button>
-                                <button onClick={this.handleReject} >Reject</button>
+                                <button type='submit' onClick={this.handleApprove} >Approve</button>
+                                <button type='submit' onClick={this.handleReject} >Reject</button>
                             </div>
                     </div>
                 </div>

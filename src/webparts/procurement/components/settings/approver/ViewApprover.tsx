@@ -1,12 +1,9 @@
 import * as React from 'react';
 import { INewApproverFormFields } from './IApproverFields';
 import { IWebPartProps } from "../../IProcurementProps";
-import { getListItems } from '../../utils/sp.utils';
 import styles from '../../Procurement.module.scss';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.min.js';
-import toast from 'react-hot-toast';
-import { listNames } from '../../utils/models.utils';
 import Loader from '../../loader/Loader';
 
 
@@ -14,37 +11,37 @@ interface ListItem extends INewApproverFormFields {
     id: number;
 }
 
-interface ApproversTableState {
+interface ApproversTableProps extends IWebPartProps {
     records: ListItem[];
     loading: boolean;
     error: string | null;
+    onEdit: (item: ListItem) => void;
 }
 
-export class ApproversTable extends React.Component<IWebPartProps, ApproversTableState> {
-    constructor(props: IWebPartProps) {
+interface ApproversTableState {
+    currentPage: number;
+    itemsPerPage: number;
+}
+
+
+export class ApproversTable extends React.Component<ApproversTableProps, ApproversTableState> {
+    constructor(props: ApproversTableProps) {
         super(props);
         this.state = {
-            records: [],
-             loading: true,
-            error: null
+            currentPage: 1,
+            itemsPerPage: 5,
         };
     }
 
-    async componentDidMount() {
-        try {
-            // Fetch list items using the getListItems function from ProcurementService
-            const listItems: INewApproverFormFields[] = await getListItems(this.props.context, listNames.approvers);
-            // Transform list items to include an id property
-            const recordsWithId = listItems.map((item, index) => ({ ...item, id: index + 1 }));
-            this.setState({ records: recordsWithId, loading: false });
-        } catch (error) {
-            this.setState({ error: 'Failed to load records', loading: false });
-            toast.error('Failed to retrieve your approver request(s). ', error);
-        }
-    }
+    handleClick = (event: React.MouseEvent<HTMLAnchorElement>, pageNumber: number) => {
+        event.preventDefault();
+        this.setState({ currentPage: pageNumber });
+    };
+
 
     render() {
-        const { records, loading, error } = this.state;
+        const { records, loading, error, onEdit } = this.props;
+        const { currentPage, itemsPerPage } = this.state;
 
         if (loading) {
             return <Loader />;
@@ -57,6 +54,18 @@ export class ApproversTable extends React.Component<IWebPartProps, ApproversTabl
         if (records.length === 0) {
             return <div className={styles.centereddiv}>No records found</div>;
         }
+
+        // Calculate the current records to display
+        const indexOfLastRecord = currentPage * itemsPerPage;
+        const indexOfFirstRecord = indexOfLastRecord - itemsPerPage;
+        const currentRecords = records.slice(indexOfFirstRecord, indexOfLastRecord);
+
+        // Calculate page numbers
+        const pageNumbers = [];
+        for (let i = 1; i <= Math.ceil(records.length / itemsPerPage); i++) {
+            pageNumbers.push(i);
+        }
+
 
 
         return (
@@ -71,19 +80,36 @@ export class ApproversTable extends React.Component<IWebPartProps, ApproversTabl
                                 <th scope="col">Role</th>
                                 <th scope="col">Level</th>
                                 <th scope="col">Email</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {records.map(record => (
+                            {currentRecords.map(record => (
                                 <tr key={record.id}>
                                     <td>{record.Personnel}</td>
                                     <td>{record.Role}</td>
                                     <td>{record.Level}</td>
                                     <td>{record.Email}</td>
+                                    <td>{record.Status}</td>
+                                    <td>
+                                        <button onClick={() => onEdit(record)}>Edit</button>
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
+                    <nav>
+                        <ul className="pagination pagination-sm justify-content-center">
+                            {pageNumbers.map(number => (
+                                <li key={number} className={`page-item ${currentPage === number ? 'active' : ''}`}>
+                                    <a href="!#" className="page-link" onClick={(e) => this.handleClick(e, number)}>
+                                        {number}
+                                    </a>
+                                </li>
+                            ))}
+                        </ul>
+                    </nav>
                 </div>
             </div>
         );

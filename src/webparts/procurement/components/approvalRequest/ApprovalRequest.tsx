@@ -9,7 +9,7 @@ import 'bootstrap/dist/js/bootstrap.min.js';
 import toast from 'react-hot-toast';
 import { listNames } from '../utils/models.utils';
 import Loader from '../loader/Loader';
-import ApprovalRecordDetailView from './ApprovalRecordDetailView'; // Import the new component
+import ApprovalRecordDetailView from './ApprovalRecordDetailView';
 
 interface ListItem extends IApprovalRequestFormFields {
     id: number;
@@ -20,6 +20,8 @@ interface ApprovalRecordsTableState {
     loading: boolean;
     error: string | null;
     selectedRecord: ListItem | null;
+    currentPage: number;
+    itemsPerPage: number;
 }
 
 export class ApprovalRecordsTable extends React.Component<IWebPartProps, ApprovalRecordsTableState> {
@@ -29,7 +31,9 @@ export class ApprovalRecordsTable extends React.Component<IWebPartProps, Approva
             records: [],
             loading: true,
             error: null,
-            selectedRecord: null
+            selectedRecord: null,
+            currentPage: 1,
+            itemsPerPage: 10
         };
     }
 
@@ -46,6 +50,12 @@ export class ApprovalRecordsTable extends React.Component<IWebPartProps, Approva
         }
     }
 
+    handleClick = (event: React.MouseEvent<HTMLAnchorElement>, number: number) => {
+        event.preventDefault();
+        this.setState({ currentPage: number });
+    };
+
+
     handleViewClick = (record: ListItem) => {
         this.setState({ selectedRecord: record });
     };
@@ -55,7 +65,7 @@ export class ApprovalRecordsTable extends React.Component<IWebPartProps, Approva
     };
 
     render() {
-        const { records, loading, error, selectedRecord } = this.state;
+        const { records, loading, error, selectedRecord, currentPage, itemsPerPage } = this.state;
 
         if (loading) {
             return <Loader />;
@@ -67,6 +77,17 @@ export class ApprovalRecordsTable extends React.Component<IWebPartProps, Approva
 
         if (records.length === 0) {
             return <div className={styles.centereddiv}>No records found</div>;
+        }
+
+        // Calculate the current records to display
+        const indexOfLastRecord = currentPage * itemsPerPage;
+        const indexOfFirstRecord = indexOfLastRecord - itemsPerPage;
+        const currentRecords = records.slice(indexOfFirstRecord, indexOfLastRecord);
+
+        // Calculate page numbers
+        const pageNumbers = [];
+        for (let i = 1; i <= Math.ceil(records.length / itemsPerPage); i++) {
+            pageNumbers.push(i);
         }
 
         return (
@@ -85,7 +106,7 @@ export class ApprovalRecordsTable extends React.Component<IWebPartProps, Approva
                             </tr>
                         </thead>
                         <tbody>
-                            {records.map(record => (
+                            {currentRecords.map(record => (
                                 <tr key={record.id}>
                                     <td>{record.Initiator}</td>
                                     <td>{record.Department}</td>
@@ -93,6 +114,7 @@ export class ApprovalRecordsTable extends React.Component<IWebPartProps, Approva
                                     <td>{moment(record.Created).format('DD-MMM-YYYY')}</td>
                                     <td>
                                         <button
+                                            className={styles.tablebutton} 
                                             onClick={() => this.handleViewClick(record)}
                                         >
                                             View
@@ -102,13 +124,26 @@ export class ApprovalRecordsTable extends React.Component<IWebPartProps, Approva
                             ))}
                         </tbody>
                     </table>
+                    <nav>
+                        <ul className="pagination pagination-sm justify-content-center">
+                            {pageNumbers.map(number => (
+                                <li key={number} className={`page-item ${currentPage === number ? 'active' : ''}`}>
+                                    <a href="!#" className="page-link" onClick={(e) => this.handleClick(e, number)}>
+                                        {number}
+                                    </a>
+                                </li>
+                            ))}
+                        </ul>
+                    </nav>
                 </div>
                 {selectedRecord && (
-                    <ApprovalRecordDetailView
-                        record={selectedRecord}
-                        onClose={this.handleCloseDetailView}
-                        context={this.props.context}
-                    />
+                    <div>
+                        <ApprovalRecordDetailView
+                            record={selectedRecord}
+                            onClose={this.handleCloseDetailView}
+                            context={this.props.context}
+                        />
+                    </div>
                 )}
             </div>
         );

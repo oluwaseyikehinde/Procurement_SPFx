@@ -3,4 +3,5 @@ export interface INewApproverFormFields {
     Role: string;
     Level: number;
     Email: string;
+    Status: string;
 }

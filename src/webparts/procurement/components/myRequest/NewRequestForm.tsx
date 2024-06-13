@@ -31,7 +31,7 @@ export class NewRequestForm extends React.Component<IWebPartProps, NewRequestFor
                 ApprovalStage: '',
                 Created: '',
             },
-            gridRows: [{ Id: 1, Supplier: '', Item: '', DeliveryDate: '', UnitPrice: 0, Quantity: 0, TotalPrice: 0 }],
+            gridRows: [{ Id: 1, Supplier: '', Item: '', DeliveryDate: '', UnitPrice: 0, Quantity: 0, Currency: '', TotalPrice: 0 }],
               supplierOptions: []
         };
     }
@@ -42,7 +42,8 @@ export class NewRequestForm extends React.Component<IWebPartProps, NewRequestFor
             const currentUser = await getLoggedInUserData(this.props.context);
             // Fetch Supplier List
             const suppliers = await getListItems(this.props.context, listNames.suppliers);
-            const supplierOptions = suppliers.map((supplier: any) => ({ ID: supplier.ID, BusinessName: supplier.BusinessName }));
+            const activeSuppliers = suppliers.filter((supplier: any) => supplier.Status === 'Active');
+            const supplierOptions = activeSuppliers.map((supplier: any) => ({ ID: supplier.ID, BusinessName: supplier.BusinessName }));
 
             // Update state
             this.setState({
@@ -79,7 +80,7 @@ export class NewRequestForm extends React.Component<IWebPartProps, NewRequestFor
 
     handleGridAddRow = () => {
         const Id = this.generateUniqueId();
-        const newRow: IGridRow = { Id: Id, Supplier: '', Item: '', DeliveryDate: '', UnitPrice: 0, Quantity: 0, TotalPrice: 0 };
+        const newRow: IGridRow = { Id: Id, Supplier: '', Item: '', DeliveryDate: '', UnitPrice: 0, Quantity: 0, Currency: '', TotalPrice: 0 };
         this.setState(prevState => ({
             gridRows: [...prevState.gridRows, newRow]
         }));
@@ -125,7 +126,7 @@ export class NewRequestForm extends React.Component<IWebPartProps, NewRequestFor
                     ApprovalStage: '',
                     Created: '',
                 },
-                gridRows: [{ Id: 1, Supplier: '', Item: '', DeliveryDate: '', UnitPrice: 0, Quantity: 0, TotalPrice: 0 }]
+                gridRows: [{ Id: 1, Supplier: '', Item: '', DeliveryDate: '', UnitPrice: 0, Quantity: 0, Currency: '', TotalPrice: 0 }]
             });
             toast.success('Procurement submitted successfully!');
         } catch (error) {

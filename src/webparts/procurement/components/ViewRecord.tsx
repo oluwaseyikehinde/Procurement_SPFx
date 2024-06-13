@@ -91,8 +91,8 @@ class RecordDetailView extends React.Component<RecordDetailViewProps, RecordDeta
                                                         <td>{item.Item}</td>
                                                         <td>{item.Quantity}</td>
                                                         <td>{moment(item.DeliveryDate).format('DD-MMM-YYYY')}</td>
-                                                        <td>{formatCurrency(item.UnitPrice)}</td>
-                                                        <td>{formatCurrency(item.Quantity * item.UnitPrice)}</td>
+                                                        <td>{item.Currency}{formatCurrency(item.UnitPrice)}</td>
+                                                        <td>{item.Currency}{formatCurrency(item.Quantity * item.UnitPrice)}</td>
                                                     </tr>
                                                 ))}
                                             </tbody>

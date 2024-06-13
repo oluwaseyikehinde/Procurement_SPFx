@@ -1,27 +1,33 @@
 import * as React from 'react';
-import { createListItem } from '../../utils/sp.utils'; // Import the create function
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.min.js';
 import styles from '../../Procurement.module.scss';
 import { INewRoleFormFields } from './IRoleFields';
 import { IWebPartProps } from "../../IProcurementProps";
-import toast from 'react-hot-toast';
-import { listNames } from '../../utils/models.utils';
 
 
-interface NewRoleFormState {
-    formData: INewRoleFormFields;
+interface NewRoleFormProps extends IWebPartProps {
+    formData: INewRoleFormFields & { id: number };
+    editing: boolean;
+    onRoleSubmit: (formData: INewRoleFormFields & { id: number }) => void;
 }
 
-export class NewRoleForm extends React.Component<IWebPartProps, NewRoleFormState> {
-    constructor(props: IWebPartProps) {
+interface NewRoleFormState {
+    formData: INewRoleFormFields & { id: number };
+}
+
+export class NewRoleForm extends React.Component<NewRoleFormProps, NewRoleFormState> {
+    constructor(props: NewRoleFormProps) {
         super(props);
         this.state = {
-            formData: {
-                Role: '',
-                Description: ''
-            }
+            formData: this.props.formData
         };
+    }
+
+    componentDidUpdate(prevProps: NewRoleFormProps) {
+        if (prevProps.formData !== this.props.formData) {
+            this.setState({ formData: this.props.formData });
+        }
     }
 
     handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -36,26 +42,24 @@ export class NewRoleForm extends React.Component<IWebPartProps, NewRoleFormState
 
     handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        try {
-            await createListItem(this.props.context, listNames.roles, this.state.formData);
-            this.setState({
-                formData: {
-                    Role: '',
-                    Description: ''
-                }
-            });
-            toast.success('Role submitted successfully!');
-        } catch (error) {
-            toast.error('Failed to submit Role.', error);
-        }
+        this.props.onRoleSubmit(this.state.formData);
+        this.setState({
+            formData: {
+                id: 0,
+                Role: '',
+                Description: '',
+                Status: ''
+            }
+        });
     };
 
+
     render() {
-        const { Role, Description } = this.state.formData;
+        const { Role, Description, Status } = this.state.formData;
 
         return (
             <div>
-                <h6 className={styles.mainheader}>New Role</h6>
+                <h6 className={styles.mainheader}>{this.props.editing ? 'Edit Role' : 'New Role'}</h6>
                 <hr />
                 <div className={styles.sectioncontainer}>
                     <form onSubmit={this.handleSubmit}>
@@ -69,8 +73,19 @@ export class NewRoleForm extends React.Component<IWebPartProps, NewRoleFormState
                                 <input className={styles.formcontrol} type="text" name="Description" value={Description} placeholder='Enter Description' onChange={this.handleInputChange} />
                             </div>
                         </div>
+                        {this.props.editing && (
+                            <div className={styles.customRow}>
+                                <div className={styles.customCol}>
+                                    <label>Status <span className={styles.labeltag}>. . . . . . . . . . . . </span></label>
+                                    <select className={styles.formcontrol} name="Status" value={Status} onChange={this.handleInputChange}>
+                                        <option value="Active">Active</option>
+                                        <option value="Inactive">Inactive</option>
+                                    </select>
+                                </div>
+                            </div>
+                        )}-
                         <div className={styles.buttoncontainer}>
-                            <button type="submit">Submit</button>
+                            <button type="submit">{this.props.editing ? 'Update' : 'Submit'}</button>
                         </div>
                     </form>
                 </div>

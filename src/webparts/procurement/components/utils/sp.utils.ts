@@ -4,6 +4,7 @@ import "@pnp/sp/lists";
 import "@pnp/sp/items";
 import { getLoggedInUserData } from "./graph.utils";
 import { listNames } from "./models.utils";
+import * as moment from 'moment';
 
 export const getSPClient = (context: any) => {
     return spfi().using(spSPFx(context));
@@ -106,6 +107,8 @@ export const createListItem = async (context: any, listName: string, itemPropert
         const initiatorFullName = userData.displayName;
         const initiatorEmail = userData.mail;
 
+        const currentDate = moment().format('YYYY-MM-DDTHH:mm:ssZ');
+
         // Log the action in the audit log
         await sp.web.lists.getByTitle(listNames.auditLog).items.add({
             Type: 'Create',
@@ -114,7 +117,9 @@ export const createListItem = async (context: any, listName: string, itemPropert
             InitiatorFullName: initiatorFullName || 'Unknown',
             InitiatorEmail: initiatorEmail || 'Unknown',
             MoreInitiatorInfo: 'More Info',
-            Information: `Created item in list ${listName}`
+            Information: `Created item in list ${listName}`,
+            ActionDate: currentDate,
+            ListName: listName
         });
 
         return newItem.data;
@@ -127,12 +132,16 @@ export const createListItem = async (context: any, listName: string, itemPropert
 export const updateListItem = async (context: any, listName: string, itemId: number, itemProperties: any) => {
     try {
         const sp = spfi().using(spSPFx(context));
+        console.log("rrrrrrrrrrrrrrrr",itemProperties)
         await sp.web.lists.getByTitle(listName).items.getById(itemId).update(itemProperties);
 
         // Get the initiator's full name and email
         const userData = await getLoggedInUserData(context);
         const initiatorFullName = userData.displayName;
         const initiatorEmail = userData.mail;
+
+        // Get the current date in the format SharePoint expects
+        const currentDate = moment().format('YYYY-MM-DDTHH:mm:ssZ');
 
         // Log the action in the audit log
         await sp.web.lists.getByTitle(listNames.auditLog).items.add({
@@ -142,7 +151,9 @@ export const updateListItem = async (context: any, listName: string, itemId: num
             InitiatorFullName: initiatorFullName || 'Unknown',
             InitiatorEmail: initiatorEmail || 'Unknown',
             MoreInitiatorInfo: 'More Info',
-            Information: `Updated item in list ${listName}`
+            Information: `Updated item in list ${listName}`,
+            ActionDate: currentDate,
+            ListName: listName
         });
     } catch (error) {
         console.error('Error updating list item:', error);
@@ -161,6 +172,8 @@ export const deleteListItem = async (context: any, listName: string, itemId: num
         const initiatorFullName = userData.displayName;
         const initiatorEmail = userData.mail;
 
+        const currentDate = moment().format('YYYY-MM-DDTHH:mm:ssZ');
+
         // Log the action in the audit log
         await sp.web.lists.getByTitle(listNames.auditLog).items.add({
             Type: 'Delete',
@@ -169,7 +182,9 @@ export const deleteListItem = async (context: any, listName: string, itemId: num
             InitiatorFullName: initiatorFullName || 'Unknown',
             InitiatorEmail: initiatorEmail || 'Unknown',
             MoreInitiatorInfo: 'More Info',
-            Information: `Deleted item in list ${listName}`
+            Information: `Deleted item in list ${listName}`,
+            ActionDate: currentDate,
+            ListName: listName
         });
     } catch (error) {
         console.error('Error deleting list item:', error);
@@ -191,6 +206,8 @@ export const approveRequest = async (context: any, listName: string, itemId: num
         const currentItem = await sp.web.lists.getByTitle(listName).items.getById(itemId)();
         const currentApprovalStage = currentItem.ApprovalStage || 0;
 
+        const currentDate = moment().format('YYYY-MM-DDTHH:mm:ssZ');
+
         // Update the item's ApprovalStatus and ApprovalStage
         await sp.web.lists.getByTitle(listName).items.getById(itemId).update({
             ApprovalStatus: 'Approved',
@@ -205,7 +222,9 @@ export const approveRequest = async (context: any, listName: string, itemId: num
             InitiatorFullName: initiatorFullName,
             InitiatorEmail: initiatorEmail,
             MoreInitiatorInfo: 'More Info',
-            Information: comment || 'No Comment'
+            Information: comment || 'No Comment',
+            ActionDate: currentDate,
+            ListName: listName
         });
 
     } catch (error) {
@@ -223,6 +242,8 @@ export const rejectRequest = async (context: any, listName: string, itemId: numb
         const initiatorFullName = userData.displayName;
         const initiatorEmail = userData.mail;
 
+        const currentDate = moment().format('YYYY-MM-DDTHH:mm:ssZ');
+
         // Update the item's ApprovalStatus
         await sp.web.lists.getByTitle(listName).items.getById(itemId).update({
             ApprovalStatus: 'Rejected'
@@ -236,7 +257,9 @@ export const rejectRequest = async (context: any, listName: string, itemId: numb
             InitiatorFullName: initiatorFullName,
             InitiatorEmail: initiatorEmail,
             MoreInitiatorInfo: 'More Info',
-            Information: comment
+            Information: comment,
+            ActionDate: currentDate,
+            ListName: listName
         });
 
     } catch (error) {
