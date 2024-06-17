@@ -17,6 +17,7 @@ interface NewRequestFormState {
     formData: INewRequestFormFields;
     gridRows: IGridRow[];
     supplierOptions: { ID: number; BusinessName: string }[];
+    isFormValid: boolean;
 }
 
 export class NewRequestForm extends React.Component<IWebPartProps, NewRequestFormState> {
@@ -32,7 +33,8 @@ export class NewRequestForm extends React.Component<IWebPartProps, NewRequestFor
                 Created: '',
             },
             gridRows: [{ Id: 1, Supplier: '', Item: '', DeliveryDate: '', UnitPrice: 0, Quantity: 0, Currency: '', TotalPrice: 0 }],
-              supplierOptions: []
+              supplierOptions: [],
+              isFormValid:false
         };
     }
 
@@ -83,7 +85,7 @@ export class NewRequestForm extends React.Component<IWebPartProps, NewRequestFor
         const newRow: IGridRow = { Id: Id, Supplier: '', Item: '', DeliveryDate: '', UnitPrice: 0, Quantity: 0, Currency: '', TotalPrice: 0 };
         this.setState(prevState => ({
             gridRows: [...prevState.gridRows, newRow]
-        }));
+        }), this.validateForm);
     };
 
     handleGridDeleteRow = (id: number) => {
@@ -95,16 +97,31 @@ export class NewRequestForm extends React.Component<IWebPartProps, NewRequestFor
                 ...row,
                 Id: index + 1 // Update the ID to the new index + 1
             }));
-            this.setState({ gridRows: updatedRows });
+            this.setState({ gridRows: updatedRows }, this.validateForm);
         });
     };
 
     handleGridChangeRow = (id: number, updatedRow: IGridRow) => {
         this.setState(prevState => ({
             gridRows: prevState.gridRows.map(row => (row.Id === id ? updatedRow : row))
-        }));
+        }), this.validateForm);
     };
 
+    handleGridUpdate = (rows: IGridRow[]) => {
+        this.setState({ gridRows: rows }, this.validateForm);
+    };
+
+    validateForm = () => {
+        const isFormValid = this.state.gridRows.length > 0 && this.state.gridRows.every(row =>
+            row.Supplier.trim() !== '' &&
+            row.Item.trim() !== '' &&
+            row.DeliveryDate.trim() !== '' &&
+            row.UnitPrice > 0 &&
+            row.Quantity > 0
+        );
+
+        this.setState({ isFormValid });
+    };
 
     handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -155,14 +172,15 @@ export class NewRequestForm extends React.Component<IWebPartProps, NewRequestFor
                         </div>
                         <EditableGrid
                             rows={this.state.gridRows}
-                            suppliers={this.state.supplierOptions.map(option => option.BusinessName)}
+                            suppliers={this.state.supplierOptions.map(supplier => supplier.BusinessName)}
                             onAddRow={this.handleGridAddRow}
                             onDeleteRow={this.handleGridDeleteRow}
                             onChangeRow={this.handleGridChangeRow}
                             context={this.props.context}
+                            onGridUpdate={this.handleGridUpdate}
                         />
                         <div className={styles.buttoncontainer}>
-                            <button type="submit">Submit</button>
+                            <button type="submit" disabled={!this.state.isFormValid}>Submit</button>
                         </div>
                     </form>
                 </div>

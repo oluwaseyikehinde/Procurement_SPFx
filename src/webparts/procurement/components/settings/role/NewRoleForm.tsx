@@ -4,7 +4,7 @@ import 'bootstrap/dist/js/bootstrap.min.js';
 import styles from '../../Procurement.module.scss';
 import { INewRoleFormFields } from './IRoleFields';
 import { IWebPartProps } from "../../IProcurementProps";
-
+import toast from 'react-hot-toast';
 
 interface NewRoleFormProps extends IWebPartProps {
     formData: INewRoleFormFields & { id: number };
@@ -14,45 +14,64 @@ interface NewRoleFormProps extends IWebPartProps {
 
 interface NewRoleFormState {
     formData: INewRoleFormFields & { id: number };
+    isFormValid: boolean;
 }
 
 export class NewRoleForm extends React.Component<NewRoleFormProps, NewRoleFormState> {
     constructor(props: NewRoleFormProps) {
         super(props);
         this.state = {
-            formData: this.props.formData
+            formData: this.props.formData,
+            isFormValid: this.isFormValid(this.props.formData)
         };
     }
 
     componentDidUpdate(prevProps: NewRoleFormProps) {
         if (prevProps.formData !== this.props.formData) {
-            this.setState({ formData: this.props.formData });
+            this.setState({
+                formData: this.props.formData,
+                isFormValid: this.isFormValid(this.props.formData)
+            });
         }
     }
 
     handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value } = event.target;
-        this.setState(prevState => ({
-            formData: {
+        this.setState(prevState => {
+            const updatedFormData = {
                 ...prevState.formData,
                 [name]: value
-            }
-        }));
+            };
+            return {
+                formData: updatedFormData,
+                isFormValid: this.isFormValid(updatedFormData)
+            };
+        });
+    };
+
+    isFormValid = (formData: INewRoleFormFields) => {
+        const { Role, Description, Status } = formData;
+        return Role !== '' && Description !== '' && Status !== '';
     };
 
     handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        this.props.onRoleSubmit(this.state.formData);
-        this.setState({
-            formData: {
-                id: 0,
-                Role: '',
-                Description: '',
-                Status: ''
-            }
-        });
+        if (this.state.isFormValid) {
+            this.props.onRoleSubmit(this.state.formData);
+            this.setState({
+                formData: {
+                    id: 0,
+                    Role: '',
+                    Description: '',
+                    Status: ''
+                },
+                isFormValid: false
+            });
+            toast.success('Role submitted successfully!');
+        } else {
+            toast.error('Please fill in all required fields.');
+        }
     };
-
 
     render() {
         const { Role, Description, Status } = this.state.formData;
@@ -83,9 +102,9 @@ export class NewRoleForm extends React.Component<NewRoleFormProps, NewRoleFormSt
                                     </select>
                                 </div>
                             </div>
-                        )}-
+                        )}
                         <div className={styles.buttoncontainer}>
-                            <button type="submit">{this.props.editing ? 'Update' : 'Submit'}</button>
+                            <button type="submit" disabled={!this.state.isFormValid}>{this.props.editing ? 'Update' : 'Submit'}</button>
                         </div>
                     </form>
                 </div>

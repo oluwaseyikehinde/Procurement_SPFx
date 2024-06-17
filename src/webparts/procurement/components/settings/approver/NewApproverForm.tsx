@@ -24,6 +24,7 @@ interface NewApproverFormProps extends IWebPartProps {
 interface NewApproverFormState {
     formData: INewApproverFormFields & { id: number };
     selectedPeople: any[];
+    isFormValid: boolean;
 }
 
 export class NewApproverForm extends React.Component<NewApproverFormProps, NewApproverFormState> {
@@ -31,67 +32,94 @@ export class NewApproverForm extends React.Component<NewApproverFormProps, NewAp
         super(props);
         this.state = {
             formData: this.props.formData,
-            selectedPeople: []
+            selectedPeople: this.props.formData.Personnel ? [{ text: this.props.formData.Personnel, secondaryText: this.props.formData.Email }] : [],
+            isFormValid: this.isFormValid(this.props.formData)
         };
     }
 
     componentDidUpdate(prevProps: NewApproverFormProps) {
         if (prevProps.formData !== this.props.formData) {
-            this.setState({ formData: this.props.formData, selectedPeople: [] });
+            this.setState({
+                formData: this.props.formData,
+                selectedPeople: this.props.formData.Personnel ? [{ text: this.props.formData.Personnel, secondaryText: this.props.formData.Email }] : [],
+                isFormValid: this.isFormValid(this.props.formData)
+            });
         }
     }
 
     handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value } = event.target;
-        this.setState(prevState => ({
-            formData: {
+        this.setState(prevState => {
+            const updatedFormData = {
                 ...prevState.formData,
                 [name]: value
-            }
-        }));
+            };
+            return {
+                formData: updatedFormData,
+                isFormValid: this.isFormValid(updatedFormData)
+            };
+        });
     };
 
     handlePeoplePickerChange = (items: any[]) => {
         if (items.length > 0) {
             const selectedUser = items[0];
-            this.setState(prevState => ({
-                formData: {
+            this.setState(prevState => {
+                const updatedFormData = {
                     ...prevState.formData,
                     Personnel: selectedUser.text || '',
                     Email: selectedUser.secondaryText || ''
-                },
-                selectedPeople: items
-            }));
+                };
+                return {
+                    formData: updatedFormData,
+                    selectedPeople: items,
+                    isFormValid: this.isFormValid(updatedFormData)
+                };
+            });
         } else {
-            this.setState(prevState => ({
-                formData: {
+            this.setState(prevState => {
+                const updatedFormData = {
                     ...prevState.formData,
                     Personnel: '',
                     Email: ''
-                },
-                selectedPeople: []
-            }));
+                };
+                return {
+                    formData: updatedFormData,
+                    selectedPeople: [],
+                    isFormValid: this.isFormValid(updatedFormData)
+                };
+            });
         }
+    };
+
+    isFormValid = (formData: INewApproverFormFields) => {
+        const { Personnel, Role, Level, Email, Status } = formData;
+        return Personnel !== '' && Role !== '' && Level !== 0 && Email !== '' && Status !== '';
     };
 
     handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        try {
-            this.props.onApproverSubmit(this.state.formData);
-            this.setState({
-                formData: {
-                    id: 0,
-                    Personnel: '',
-                    Role: '',
-                    Level: 0,
-                    Email: '',
-                    Status: ''
-                },
-                selectedPeople: []
-            });
-            toast.success('Approver submitted successfully!');
-        } catch (error) {
-            toast.error('Failed to submit Approver.', error);
+        if (this.state.isFormValid) {
+            try {
+                this.props.onApproverSubmit(this.state.formData);
+                this.setState({
+                    formData: {
+                        id: 0,
+                        Personnel: '',
+                        Role: '',
+                        Level: 0,
+                        Email: '',
+                        Status: ''
+                    },
+                    selectedPeople: [],
+                    isFormValid: false
+                });
+                toast.success('Approver submitted successfully!');
+            } catch (error) {
+                toast.error('Failed to submit Approver.', error);
+            }
+        } else {
+            toast.error('Please fill in all required fields.');
         }
     };
 
@@ -152,7 +180,7 @@ export class NewApproverForm extends React.Component<NewApproverFormProps, NewAp
                                     showHiddenInUI={false}
                                     principalTypes={[PrincipalType.User]}
                                     resolveDelay={1000}
-                                    defaultSelectedUsers={this.state.selectedPeople.map(person => person.text)}
+                                    defaultSelectedUsers={this.state.selectedPeople.map(person => person.secondaryText)}
                                     styles={{
                                         text: {
                                             width: '115%',
@@ -171,7 +199,9 @@ export class NewApproverForm extends React.Component<NewApproverFormProps, NewAp
                         </div>
 
                         <div className={styles.buttoncontainer}>
-                            <button type="submit">{this.props.editing ? 'Update' : 'Submit'}</button>
+                            <button type="submit" disabled={!this.state.isFormValid}>
+                                {this.props.editing ? 'Update' : 'Submit'}
+                            </button>
                         </div>
                     </form>
                 </div>

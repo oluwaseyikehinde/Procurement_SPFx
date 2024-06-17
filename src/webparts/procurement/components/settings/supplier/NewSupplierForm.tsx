@@ -4,6 +4,7 @@ import 'bootstrap/dist/js/bootstrap.min.js';
 import styles from '../../Procurement.module.scss';
 import { INewSupplierFormFields } from './ISupplierFields';
 import { IWebPartProps } from "../../IProcurementProps";
+import toast from 'react-hot-toast';
 
 interface NewSupplierFormProps extends IWebPartProps {
     formData: INewSupplierFormFields & { id: number };
@@ -13,45 +14,65 @@ interface NewSupplierFormProps extends IWebPartProps {
 
 interface NewSupplierFormState {
     formData: INewSupplierFormFields & { id: number };
+    isFormValid: boolean;
 }
 
 export class NewSupplierForm extends React.Component<NewSupplierFormProps, NewSupplierFormState> {
     constructor(props: NewSupplierFormProps) {
         super(props);
         this.state = {
-            formData: this.props.formData
+            formData: this.props.formData,
+            isFormValid: this.isFormValid(this.props.formData)
         };
     }
 
     componentDidUpdate(prevProps: NewSupplierFormProps) {
         if (prevProps.formData !== this.props.formData) {
-            this.setState({ formData: this.props.formData });
+            this.setState({
+                formData: this.props.formData,
+                isFormValid: this.isFormValid(this.props.formData)
+            });
         }
     }
 
     handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value } = event.target;
-        this.setState(prevState => ({
-            formData: {
+        this.setState(prevState => {
+            const updatedFormData = {
                 ...prevState.formData,
                 [name]: value
-            }
-        }));
+            };
+            return {
+                formData: updatedFormData,
+                isFormValid: this.isFormValid(updatedFormData)
+            };
+        });
+    };
+
+    isFormValid = (formData: INewSupplierFormFields) => {
+        const { BusinessName, ContactName, ContactPhone, Email, Status } = formData;
+        return BusinessName !== '' && ContactName !== '' && ContactPhone !== '' && Email !== '' && Status !== '';
     };
 
     handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        this.props.onSupplierSubmit(this.state.formData);
-        this.setState({
-            formData: {
-                id: 0,
-                BusinessName: '',
-                ContactName: '',
-                ContactPhone: '',
-                Email: '',
-                Status: ''
-            }
-        });
+        if (this.state.isFormValid) {
+            this.props.onSupplierSubmit(this.state.formData);
+            this.setState({
+                formData: {
+                    id: 0,
+                    BusinessName: '',
+                    ContactName: '',
+                    ContactPhone: '',
+                    Email: '',
+                    Status: ''
+                },
+                isFormValid: false
+            });
+            toast.success('Supplier submitted successfully!');
+        } else {
+            toast.error('Please fill in all required fields.');
+        }
     };
 
     render() {
@@ -95,7 +116,7 @@ export class NewSupplierForm extends React.Component<NewSupplierFormProps, NewSu
                             </div>
                         )}
                         <div className={styles.buttoncontainer}>
-                            <button type="submit">{this.props.editing ? 'Update' : 'Submit'}</button>
+                            <button type="submit" disabled={!this.state.isFormValid}>{this.props.editing ? 'Update' : 'Submit'}</button>
                         </div>
                     </form>
                 </div>

@@ -10,6 +10,7 @@ interface RecordDetailViewProps {
     record: any;
     onClose: () => void;
     context: IWebPartProps['context'];
+    refreshRecords: () => void;
 }
 
 interface RecordDetailViewState {
@@ -17,6 +18,7 @@ interface RecordDetailViewState {
     loading: boolean;
     error: string | null;
     comment: string;
+    activeApproversCount: number;
 }
 
 class ApprovalRecordDetailView extends React.Component<RecordDetailViewProps, RecordDetailViewState> {
@@ -26,7 +28,8 @@ class ApprovalRecordDetailView extends React.Component<RecordDetailViewProps, Re
             relatedItems: [],
             loading: true,
             error: null,
-            comment: ''
+            comment: '',
+            activeApproversCount: 0
         };
     }
 
@@ -34,38 +37,52 @@ class ApprovalRecordDetailView extends React.Component<RecordDetailViewProps, Re
         try {
             const relatedItems = await getListItems(this.props.context, listNames.requestItem);
             const filteredItems = relatedItems.filter((item: any) => item.ProcurementId === this.props.record.id);
-            this.setState({ relatedItems: filteredItems, loading: false });
+
+            const approvers = await getListItems(this.props.context, listNames.approvers);
+            const activeApprovers = approvers.filter(approver => approver.Status === 'Active');
+
+            this.setState({
+                relatedItems: filteredItems,
+                loading: false,
+                activeApproversCount: activeApprovers.length
+            });
         } catch (error) {
             this.setState({ error: 'Failed to load related items', loading: false });
         }
     }
 
-     handleApprove = async () => {
+    handleApprove = async () => {
         try {
-            const { context, record } = this.props;
-            const { comment } = this.state;
+            const { context, record, refreshRecords } = this.props;
+            const { comment, activeApproversCount } = this.state;
 
-            await approveRequest(context, listNames.request, record.Id, comment);
+            await approveRequest(context, listNames.request, record.Id, comment, activeApproversCount);
             toast.success('Request Approved successfully!');
             this.props.onClose();
+            refreshRecords();
         } catch (error) {
             toast.error('Failed to Approve Procurement Request.', error);
         }
     };
 
     handleReject = async () => {
-        try {
-            const { context, record } = this.props;
-            const { comment } = this.state;
+        const { context, record, refreshRecords } = this.props;
+        const { comment, activeApproversCount } = this.state;
 
-            await rejectRequest(context, listNames.request, record.Id, comment);
+        if (comment.trim() === '') {
+            toast.error('Comment is required to reject the request.');
+            return;
+        }
+
+        try {
+            await rejectRequest(context, listNames.request, record.Id, comment, activeApproversCount);
             toast.success('Request Rejected successfully!');
             this.props.onClose();
+            refreshRecords();
         } catch (error) {
             toast.error('Failed to Reject Procurement Request.', error);
         }
     };
-
 
     handleCommentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         this.setState({ comment: e.target.value });
@@ -141,10 +158,10 @@ class ApprovalRecordDetailView extends React.Component<RecordDetailViewProps, Re
                                 placeholder="Enter your comment"
                             />
                         </div>
-                            <div className={styles.buttoncontainer}>
-                                <button type='submit' onClick={this.handleApprove} >Approve</button>
-                                <button type='submit' onClick={this.handleReject} >Reject</button>
-                            </div>
+                        <div className={styles.buttoncontainer}>
+                            <button type='submit' onClick={this.handleApprove}>Approve</button>
+                            <button type='submit' onClick={this.handleReject}>Reject</button>
+                        </div>
                     </div>
                 </div>
             </div>

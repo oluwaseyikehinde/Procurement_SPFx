@@ -4,6 +4,7 @@ import 'bootstrap/dist/js/bootstrap.min.js';
 import styles from '../../Procurement.module.scss';
 import { INewItemFormFields } from './IItemFields';
 import { IWebPartProps } from "../../IProcurementProps";
+import toast from 'react-hot-toast';
 
 interface SupplierOption {
     ID: number;
@@ -19,45 +20,65 @@ interface NewItemFormProps extends IWebPartProps {
 
 interface NewItemFormState {
     formData: INewItemFormFields & { id: number };
+    isFormValid: boolean;
 }
 
 export class NewItemForm extends React.Component<NewItemFormProps, NewItemFormState> {
     constructor(props: NewItemFormProps) {
         super(props);
         this.state = {
-            formData: this.props.formData
+            formData: this.props.formData,
+            isFormValid: this.isFormValid(this.props.formData)
         };
     }
 
     componentDidUpdate(prevProps: NewItemFormProps) {
         if (prevProps.formData !== this.props.formData) {
-            this.setState({ formData: this.props.formData });
+            this.setState({
+                formData: this.props.formData,
+                isFormValid: this.isFormValid(this.props.formData)
+            });
         }
     }
 
     handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value } = event.target;
-        this.setState(prevState => ({
-            formData: {
+        this.setState(prevState => {
+            const updatedFormData = {
                 ...prevState.formData,
                 [name]: value
-            }
-        }));
+            };
+            return {
+                formData: updatedFormData,
+                isFormValid: this.isFormValid(updatedFormData)
+            };
+        });
+    };
+
+    isFormValid = (formData: INewItemFormFields) => {
+        const { Supplier, Item, Currency, Price, Status } = formData;
+        return Supplier !== '' && Item !== '' && Currency !== '' && Price !== 0 && Status !== '';
     };
 
     handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        this.props.onItemSubmit(this.state.formData);
-        this.setState({
-            formData: {
-                id: 0,
-                Supplier: '',
-                Item: '',
-                Currency: '',
-                Price: 0,
-                Status: ''
-            }
-        });
+        if (this.state.isFormValid) {
+            this.props.onItemSubmit(this.state.formData);
+            this.setState({
+                formData: {
+                    id: 0,
+                    Supplier: '',
+                    Item: '',
+                    Currency: '',
+                    Price: 0,
+                    Status: ''
+                },
+                isFormValid: false
+            });
+            toast.success('Item submitted successfully!');
+        } else {
+            toast.error('Please fill in all required fields.');
+        }
     };
 
     render() {
@@ -108,7 +129,7 @@ export class NewItemForm extends React.Component<NewItemFormProps, NewItemFormSt
                             </div>
                         )}
                         <div className={styles.buttoncontainer}>
-                            <button type="submit">{this.props.editing ? 'Update' : 'Submit'}</button>
+                            <button type="submit" disabled={!this.state.isFormValid}>{this.props.editing ? 'Update' : 'Submit'}</button>
                         </div>
                     </form>
                 </div>

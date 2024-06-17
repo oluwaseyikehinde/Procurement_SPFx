@@ -12,9 +12,10 @@ interface EditableGridProps {
     onDeleteRow: (id: number) => void;
     onChangeRow: (id: number, row: IGridRow) => void;
     context: any;
+    onGridUpdate: (rows: IGridRow[]) => void;
 }
 
-const EditableGrid: React.FC<EditableGridProps> = ({ rows, suppliers, onAddRow, onDeleteRow, onChangeRow, context }) => {
+const EditableGrid: React.FC<EditableGridProps> = ({ rows, suppliers, onAddRow, onDeleteRow, onChangeRow, context, onGridUpdate }) => {
     const [itemsBySupplier, setItemsBySupplier] = React.useState<{ [supplier: string]: string[] }>({});
     const [itemLists, setItemLists] = React.useState<{ [item: string]: { price: number, currency: string } }>({});
 
@@ -51,10 +52,12 @@ const EditableGrid: React.FC<EditableGridProps> = ({ rows, suppliers, onAddRow, 
     const handleSupplierChange = (id: number, supplier: string) => {
         const updatedRows = rows.map(row => {
             if (row.Id === id) {
-                return { ...row, Supplier: supplier, Item: '', UnitPrice: 0 };
+                return { ...row, Supplier: supplier, Item: '', UnitPrice: 0, Currency: '' };
             }
             return row;
         });
+
+        onGridUpdate(updatedRows);
         const updatedRow = updatedRows.filter(row => row.Id === id)[0];
         if (updatedRow) {
             onChangeRow(id, updatedRow);
@@ -69,6 +72,7 @@ const EditableGrid: React.FC<EditableGridProps> = ({ rows, suppliers, onAddRow, 
             }
             return row;
         });
+        onGridUpdate(updatedRows);
         const updatedRow = updatedRows.filter(row => row.Id === id)[0];
         if (updatedRow) {
             onChangeRow(id, updatedRow);
@@ -82,6 +86,7 @@ const EditableGrid: React.FC<EditableGridProps> = ({ rows, suppliers, onAddRow, 
             }
             return row;
         });
+        onGridUpdate(updatedRows);
         const updatedRow = updatedRows.filter(row => row.Id === id)[0];
         if (updatedRow) {
             onChangeRow(id, updatedRow);

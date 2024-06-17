@@ -36,8 +36,12 @@ export class ApprovalRecordsTable extends React.Component<IWebPartProps, Approva
             itemsPerPage: 10
         };
     }
-
+    
     async componentDidMount() {
+        this.getRecordList();
+    }
+
+    getRecordList = async () => {
         try {
             // Fetch list items using the getListItems function from ProcurementService
             const listItems: IApprovalRequestFormFields[] = await getListItems(this.props.context, listNames.request);
@@ -142,6 +146,7 @@ export class ApprovalRecordsTable extends React.Component<IWebPartProps, Approva
                             record={selectedRecord}
                             onClose={this.handleCloseDetailView}
                             context={this.props.context}
+                            refreshRecords={this.getRecordList}
                         />
                     </div>
                 )}
