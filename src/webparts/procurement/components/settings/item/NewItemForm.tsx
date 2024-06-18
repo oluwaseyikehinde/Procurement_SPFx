@@ -66,8 +66,10 @@ export class NewItemForm extends React.Component<NewItemFormProps, NewItemFormSt
     handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         this.setState({ isSubmitting: true });
+
         if (this.state.isFormValid) {
-            this.props.onItemSubmit(this.state.formData);
+            await this.props.onItemSubmit(this.state.formData);  // Await the submission
+
             this.setState({
                 formData: {
                     id: 0,
@@ -80,7 +82,6 @@ export class NewItemForm extends React.Component<NewItemFormProps, NewItemFormSt
                 isFormValid: false,
                 isSubmitting: false
             });
-            toast.success('Item submitted successfully!');
         } else {
             this.setState({ isSubmitting: false });
             toast.error('Please fill in all required fields.');

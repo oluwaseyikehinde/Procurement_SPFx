@@ -61,7 +61,7 @@ export class NewRoleForm extends React.Component<NewRoleFormProps, NewRoleFormSt
         event.preventDefault();
         this.setState({ isSubmitting: true });
         if (this.state.isFormValid) {
-            this.props.onRoleSubmit(this.state.formData);
+            await this.props.onRoleSubmit(this.state.formData);
             this.setState({
                 formData: {
                     id: 0,
@@ -72,7 +72,6 @@ export class NewRoleForm extends React.Component<NewRoleFormProps, NewRoleFormSt
                 isFormValid: false,
                 isSubmitting: false
             });
-            toast.success('Role submitted successfully!');
         } else {
             this.setState({ isSubmitting: false });
             toast.error('Please fill in all required fields.');

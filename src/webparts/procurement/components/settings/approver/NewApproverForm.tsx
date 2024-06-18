@@ -104,8 +104,7 @@ export class NewApproverForm extends React.Component<NewApproverFormProps, NewAp
         event.preventDefault();
         this.setState({ isSubmitting: true });
         if (this.state.isFormValid) {
-            try {
-                this.props.onApproverSubmit(this.state.formData);
+                await this.props.onApproverSubmit(this.state.formData);
                 this.setState({
                     formData: {
                         id: 0,
@@ -119,12 +118,8 @@ export class NewApproverForm extends React.Component<NewApproverFormProps, NewAp
                     isFormValid: false,
                     isSubmitting: false
                 });
-                toast.success('Approver submitted successfully!');
-            } catch (error) {
-                this.setState({ isSubmitting: false });
-                toast.error('Failed to submit Approver.', error);
-            }
         } else {
+            this.setState({ isSubmitting: false });
             toast.error('Please fill in all required fields.');
         }
     };

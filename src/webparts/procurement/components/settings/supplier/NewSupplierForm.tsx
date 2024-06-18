@@ -61,7 +61,7 @@ export class NewSupplierForm extends React.Component<NewSupplierFormProps, NewSu
         event.preventDefault();
         this.setState({ isSubmitting: true });
         if (this.state.isFormValid) {
-            this.props.onSupplierSubmit(this.state.formData);
+            await this.props.onSupplierSubmit(this.state.formData);
             this.setState({
                 formData: {
                     id: 0,
@@ -74,7 +74,6 @@ export class NewSupplierForm extends React.Component<NewSupplierFormProps, NewSu
                 isFormValid: false,
                 isSubmitting: false
             });
-            toast.success('Supplier submitted successfully!');
         } else {
             this.setState({ isSubmitting: false });
             toast.error('Please fill in all required fields.');
