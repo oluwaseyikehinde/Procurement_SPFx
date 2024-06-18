@@ -10,6 +10,7 @@ import toast from 'react-hot-toast';
 import { listNames } from '../utils/models.utils';
 import Loader from '../loader/Loader';
 import RecordDetailView from '../ViewRecord';
+import { Icon } from 'office-ui-fabric-react';
 
 interface ListItem extends IAllRequestFormFields {
     id: number;
@@ -114,7 +115,7 @@ export class AllRecordsTable extends React.Component<IWebPartProps, AllRecordsTa
                                     <td>{moment(record.Created).format('DD-MMM-YYYY')}</td>
                                     <td>
                                         <button className={styles.tablebutton} onClick={() => this.handleViewClick(record)}>
-                                            View
+                                            <Icon iconName="View" className={styles.buttonicon} /> View
                                         </button>
                                     </td>
                                 </tr>

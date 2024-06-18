@@ -5,6 +5,7 @@ import styles from '../../Procurement.module.scss';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.min.js';
 import Loader from '../../loader/Loader';
+import { Icon } from 'office-ui-fabric-react';
 
 interface ListItem extends INewSupplierFormFields {
     id: number;
@@ -88,7 +89,9 @@ export class SuppliersTable extends React.Component<SuppliersTableProps, Supplie
                                     <td>{record.Email}</td>
                                     <td>{record.Status}</td>
                                     <td>
-                                        <button onClick={() => onEdit(record)}>Edit</button>
+                                        <button className={styles.tablebutton} onClick={() => onEdit(record)}>
+                                            <Icon iconName="Edit" className={styles.buttonicon} /> Edit
+                                        </button>
                                     </td>
                                 </tr>
                             ))}

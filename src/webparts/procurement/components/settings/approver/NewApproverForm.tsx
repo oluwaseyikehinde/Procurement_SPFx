@@ -7,6 +7,7 @@ import { IWebPartProps } from "../../IProcurementProps";
 import toast from 'react-hot-toast';
 import { PeoplePicker, PrincipalType, IPeoplePickerContext } from "@pnp/spfx-controls-react/lib/PeoplePicker";
 import { WebPartContext } from "@microsoft/sp-webpart-base";
+import { Icon } from 'office-ui-fabric-react/lib/Icon';
 
 interface RoleOption {
     ID: number;
@@ -25,6 +26,7 @@ interface NewApproverFormState {
     formData: INewApproverFormFields & { id: number };
     selectedPeople: any[];
     isFormValid: boolean;
+    isSubmitting: boolean;
 }
 
 export class NewApproverForm extends React.Component<NewApproverFormProps, NewApproverFormState> {
@@ -33,7 +35,8 @@ export class NewApproverForm extends React.Component<NewApproverFormProps, NewAp
         this.state = {
             formData: this.props.formData,
             selectedPeople: this.props.formData.Personnel ? [{ text: this.props.formData.Personnel, secondaryText: this.props.formData.Email }] : [],
-            isFormValid: this.isFormValid(this.props.formData)
+            isFormValid: this.isFormValid(this.props.formData),
+            isSubmitting: false
         };
     }
 
@@ -99,6 +102,7 @@ export class NewApproverForm extends React.Component<NewApproverFormProps, NewAp
 
     handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        this.setState({ isSubmitting: true });
         if (this.state.isFormValid) {
             try {
                 this.props.onApproverSubmit(this.state.formData);
@@ -112,10 +116,12 @@ export class NewApproverForm extends React.Component<NewApproverFormProps, NewAp
                         Status: ''
                     },
                     selectedPeople: [],
-                    isFormValid: false
+                    isFormValid: false,
+                    isSubmitting: false
                 });
                 toast.success('Approver submitted successfully!');
             } catch (error) {
+                this.setState({ isSubmitting: false });
                 toast.error('Failed to submit Approver.', error);
             }
         } else {
@@ -125,6 +131,7 @@ export class NewApproverForm extends React.Component<NewApproverFormProps, NewAp
 
     render() {
         const { Role, Level, Status } = this.state.formData;
+        const {editing } = this.props;
 
         const peoplePickerContext: IPeoplePickerContext = {
             absoluteUrl: this.props.context.pageContext.web.absoluteUrl,
@@ -199,9 +206,19 @@ export class NewApproverForm extends React.Component<NewApproverFormProps, NewAp
                         </div>
 
                         <div className={styles.buttoncontainer}>
-                            <button type="submit" disabled={!this.state.isFormValid}>
-                                {this.props.editing ? 'Update' : 'Submit'}
-                            </button>
+                            {!this.state.isSubmitting ? (
+                                <button type="submit" disabled={!this.state.isFormValid}>
+                                    <Icon iconName={editing ? "Sync" : "SkypeCircleCheck"} className={styles.buttonicon} />
+                                    {editing ? 'Update' : 'Submit'}
+                                </button>
+                            ) : (
+                                <button className={styles.submitingbutton} disabled>
+                                        <div className={styles.loadingcontainer}>
+                                            <div className={styles.loadingbar}></div>
+                                        </div>
+                                    {editing ? 'Updating...' : 'Submitting...'}
+                                </button>
+                            )}
                         </div>
                     </form>
                 </div>

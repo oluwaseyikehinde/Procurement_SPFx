@@ -11,6 +11,7 @@ import { listNames } from '../utils/models.utils';
 import Loader from '../loader/Loader';
 import RecordDetailView from '../ViewRecord';
 import RecordDetailTracker from '../TrackRecord';
+import { Icon } from 'office-ui-fabric-react';
 
 
 interface ListItem extends INewRequestFormFields {
@@ -128,10 +129,10 @@ export class RecordsTable extends React.Component<IWebPartProps, RecordsTableSta
                                     <td>{moment(record.Created).format('DD-MMM-YYYY')}</td>
                                     <td>
                                         <button className={styles.tablebutton} onClick={() => this.handleViewClick(record)}>
-                                            View
+                                            <Icon iconName="View" className={styles.buttonicon} /> View
                                         </button>
                                         <button className={styles.tablebutton} onClick={() => this.handleTrackerClick(record)}>
-                                            Tracker
+                                            <Icon iconName="Clock" className={styles.buttonicon} /> Tracker
                                         </button>
                                     </td>
                                 </tr>

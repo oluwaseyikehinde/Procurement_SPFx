@@ -4,6 +4,7 @@ import styles from './Procurement.module.scss';
 import { getListItems } from './utils/sp.utils';
 import { listNames } from './utils/models.utils';
 import { IWebPartProps } from './IProcurementProps';
+import { Icon } from 'office-ui-fabric-react';
 
 interface RecordDetailViewProps {
     record: any;
@@ -55,7 +56,7 @@ class RecordDetailView extends React.Component<RecordDetailViewProps, RecordDeta
                     <h4>
                         Record Details
                         <span>
-                            <button onClick={onClose} className={styles.closeButton}>X</button>
+                            <Icon iconName="ErrorBadge" onClick={onClose} className={styles.closeButton} />
                         </span>
                     </h4>
                     <div className={styles.modalRecord}>

@@ -5,6 +5,7 @@ import styles from '../../Procurement.module.scss';
 import { INewItemFormFields } from './IItemFields';
 import { IWebPartProps } from "../../IProcurementProps";
 import toast from 'react-hot-toast';
+import { Icon } from 'office-ui-fabric-react/lib/Icon';
 
 interface SupplierOption {
     ID: number;
@@ -21,6 +22,7 @@ interface NewItemFormProps extends IWebPartProps {
 interface NewItemFormState {
     formData: INewItemFormFields & { id: number };
     isFormValid: boolean;
+    isSubmitting: boolean;
 }
 
 export class NewItemForm extends React.Component<NewItemFormProps, NewItemFormState> {
@@ -28,7 +30,8 @@ export class NewItemForm extends React.Component<NewItemFormProps, NewItemFormSt
         super(props);
         this.state = {
             formData: this.props.formData,
-            isFormValid: this.isFormValid(this.props.formData)
+            isFormValid: this.isFormValid(this.props.formData),
+            isSubmitting: false
         };
     }
 
@@ -62,6 +65,7 @@ export class NewItemForm extends React.Component<NewItemFormProps, NewItemFormSt
 
     handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        this.setState({ isSubmitting: true });
         if (this.state.isFormValid) {
             this.props.onItemSubmit(this.state.formData);
             this.setState({
@@ -73,16 +77,19 @@ export class NewItemForm extends React.Component<NewItemFormProps, NewItemFormSt
                     Price: 0,
                     Status: ''
                 },
-                isFormValid: false
+                isFormValid: false,
+                isSubmitting: false
             });
             toast.success('Item submitted successfully!');
         } else {
+            this.setState({ isSubmitting: false });
             toast.error('Please fill in all required fields.');
         }
     };
 
     render() {
         const { Supplier, Item, Currency, Price, Status } = this.state.formData;
+        const { editing } = this.props;
 
         return (
             <div>
@@ -129,7 +136,19 @@ export class NewItemForm extends React.Component<NewItemFormProps, NewItemFormSt
                             </div>
                         )}
                         <div className={styles.buttoncontainer}>
-                            <button type="submit" disabled={!this.state.isFormValid}>{this.props.editing ? 'Update' : 'Submit'}</button>
+                            {!this.state.isSubmitting ? (
+                                <button type="submit" disabled={!this.state.isFormValid}>
+                                    <Icon iconName={editing ? "Sync" : "SkypeCircleCheck"} className={styles.buttonicon} />
+                                    {editing ? 'Update' : 'Submit'}
+                                </button>
+                            ) : (
+                                <button className={styles.submitingbutton} disabled>
+                                    <div className={styles.loadingcontainer}>
+                                        <div className={styles.loadingbar}></div>
+                                    </div>
+                                    {editing ? 'Updating...' : 'Submitting...'}
+                                </button>
+                            )}
                         </div>
                     </form>
                 </div>

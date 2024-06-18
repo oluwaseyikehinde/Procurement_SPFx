@@ -5,6 +5,7 @@ import styles from '../../Procurement.module.scss';
 import { INewRoleFormFields } from './IRoleFields';
 import { IWebPartProps } from "../../IProcurementProps";
 import toast from 'react-hot-toast';
+import { Icon } from 'office-ui-fabric-react/lib/Icon';
 
 interface NewRoleFormProps extends IWebPartProps {
     formData: INewRoleFormFields & { id: number };
@@ -15,6 +16,7 @@ interface NewRoleFormProps extends IWebPartProps {
 interface NewRoleFormState {
     formData: INewRoleFormFields & { id: number };
     isFormValid: boolean;
+    isSubmitting: boolean;
 }
 
 export class NewRoleForm extends React.Component<NewRoleFormProps, NewRoleFormState> {
@@ -22,7 +24,8 @@ export class NewRoleForm extends React.Component<NewRoleFormProps, NewRoleFormSt
         super(props);
         this.state = {
             formData: this.props.formData,
-            isFormValid: this.isFormValid(this.props.formData)
+            isFormValid: this.isFormValid(this.props.formData),
+            isSubmitting: false
         };
     }
 
@@ -56,6 +59,7 @@ export class NewRoleForm extends React.Component<NewRoleFormProps, NewRoleFormSt
 
     handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        this.setState({ isSubmitting: true });
         if (this.state.isFormValid) {
             this.props.onRoleSubmit(this.state.formData);
             this.setState({
@@ -65,16 +69,19 @@ export class NewRoleForm extends React.Component<NewRoleFormProps, NewRoleFormSt
                     Description: '',
                     Status: ''
                 },
-                isFormValid: false
+                isFormValid: false,
+                isSubmitting: false
             });
             toast.success('Role submitted successfully!');
         } else {
+            this.setState({ isSubmitting: false });
             toast.error('Please fill in all required fields.');
         }
     };
 
     render() {
         const { Role, Description, Status } = this.state.formData;
+        const { editing } = this.props;
 
         return (
             <div>
@@ -104,7 +111,19 @@ export class NewRoleForm extends React.Component<NewRoleFormProps, NewRoleFormSt
                             </div>
                         )}
                         <div className={styles.buttoncontainer}>
-                            <button type="submit" disabled={!this.state.isFormValid}>{this.props.editing ? 'Update' : 'Submit'}</button>
+                            {!this.state.isSubmitting ? (
+                                <button type="submit" disabled={!this.state.isFormValid}>
+                                    <Icon iconName={editing ? "Sync" : "SkypeCircleCheck"} className={styles.buttonicon} />
+                                    {editing ? 'Update' : 'Submit'}
+                                </button>
+                            ) : (
+                                <button className={styles.submitingbutton} disabled>
+                                    <div className={styles.loadingcontainer}>
+                                        <div className={styles.loadingbar}></div>
+                                    </div>
+                                    {editing ? 'Updating...' : 'Submitting...'}
+                                </button>
+                            )}
                         </div>
                     </form>
                 </div>

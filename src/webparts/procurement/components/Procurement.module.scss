@@ -149,8 +149,26 @@ button[type="submit"] {
   }
 }
 
-button:disabled,
-button[disabled] {
+.submitingbutton:disabled {
+  padding: 4px 12px;
+  background-color: #3b72d8;
+  color: #fff;
+  border: none;
+  border-radius: 0px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  font-size: 12px;
+  margin-left: 5px;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #0056b3;
+  }
+}
+
+button[type="submit"]:disabled,
+button[type="submit"][disabled] {
   border: 1px solid #999999;
   background-color: #cccccc;
   color: #666666;
@@ -161,6 +179,51 @@ button[disabled] {
     }
 }
 
+.loadingcontainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+.loadingbar {
+  background-color: rgb(164, 164, 252);
+  min-width: 100%;
+  min-height: 5px;
+  position: relative;
+  overflow: hidden;
+}
+
+.loadingbar::after {
+  content: "";
+  min-height: 5px;
+  position: absolute;
+  background: #fff;
+  transform: translateX(-100%);
+  animation: animate 2s infinite;
+}
+
+.loadingbar::before {
+  content: "";
+  min-height: 5px;
+  position: absolute;
+  background: #fff;
+  transform: translateX(-100%);
+  animation: animate 2s infinite;
+  animation-delay: 1s;
+}
+
+@keyframes animate {
+  0% {
+    transform: translateX(-150%);
+    min-width: 100px;
+  }
+
+  100% {
+    transform: translateX(300%);
+    min-width: 400px;
+  }
+}
 
 .addbutton{
   padding: 4px 12px;
@@ -181,6 +244,7 @@ button[disabled] {
 
 .tablebutton{
   padding: 4px 12px;
+  width: 80px;
   background-color: #6c757d;
   color: #fff;
   margin: 0px 3px;
@@ -195,6 +259,11 @@ button[disabled] {
     color: #6c757d;
     border: 1px solid #6c757d;
   }
+}
+
+.buttonicon {
+  margin-right: 5px;
+  vertical-align: middle;
 }
 
 .centereddiv {
@@ -235,7 +304,7 @@ button[disabled] {
 
 .closeButton {
   background: none;
-  color: #d83b3b;
+  color: #3b72d8;
   border: none;
   font-size: 16px;
   cursor: pointer;
@@ -290,6 +359,10 @@ button[disabled] {
 
 .notstarted {
   background-color: grey;
+}
+
+.rejected {
+  background-color: red;
 }
 
 .trackerDetails {

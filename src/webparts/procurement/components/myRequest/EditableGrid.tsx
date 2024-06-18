@@ -101,6 +101,8 @@ const EditableGrid: React.FC<EditableGridProps> = ({ rows, suppliers, onAddRow, 
         })}`;
     };
 
+    const todayDate = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+
     return (
         <div className="table-responsive">
             <table className={`table table-bordered table-sm ${styles.editableTable}`}>
@@ -140,7 +142,7 @@ const EditableGrid: React.FC<EditableGridProps> = ({ rows, suppliers, onAddRow, 
                                 <input className={styles.tableform} type="number" value={row.Quantity} onChange={e => handleChange(row.Id, 'Quantity', parseInt(e.target.value))} />
                             </td>
                             <td>
-                                <input className={styles.tableform} type="date" value={row.DeliveryDate} onChange={e => handleChange(row.Id, 'DeliveryDate', e.target.value)} />
+                                <input className={styles.tableform} type="date" value={row.DeliveryDate} min={todayDate} onChange={e => handleChange(row.Id, 'DeliveryDate', e.target.value)} />
                             </td>
                             <td className={styles.rightAlign}>
                                 {formatCurrency(row.UnitPrice, row.Currency)}
@@ -155,7 +157,9 @@ const EditableGrid: React.FC<EditableGridProps> = ({ rows, suppliers, onAddRow, 
                     ))}
                 </tbody>
             </table>
-            <button type="button" className={styles.addbutton} onClick={onAddRow}>Add Row</button>
+            <button type="button" className={styles.addbutton} onClick={onAddRow}>
+                <Icon iconName="Add" className={styles.buttonicon} /> Add Row
+            </button>
         </div>
     );
 };

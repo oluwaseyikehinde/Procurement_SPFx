@@ -10,6 +10,7 @@ import EditableGrid from './EditableGrid';
 import { IGridRow } from './IGridRow';
 import toast from 'react-hot-toast';
 import { listNames } from '../utils/models.utils';
+import { Icon } from 'office-ui-fabric-react/lib/Icon';
 
 
 
@@ -18,6 +19,7 @@ interface NewRequestFormState {
     gridRows: IGridRow[];
     supplierOptions: { ID: number; BusinessName: string }[];
     isFormValid: boolean;
+    isSubmitting: boolean;
 }
 
 export class NewRequestForm extends React.Component<IWebPartProps, NewRequestFormState> {
@@ -34,7 +36,8 @@ export class NewRequestForm extends React.Component<IWebPartProps, NewRequestFor
             },
             gridRows: [{ Id: 1, Supplier: '', Item: '', DeliveryDate: '', UnitPrice: 0, Quantity: 0, Currency: '', TotalPrice: 0 }],
               supplierOptions: [],
-              isFormValid:false
+              isFormValid:false,
+              isSubmitting: false
         };
     }
 
@@ -125,6 +128,7 @@ export class NewRequestForm extends React.Component<IWebPartProps, NewRequestFor
 
     handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        this.setState({ isSubmitting: true });
         try {
             const requestData = {
                 ...this.state.formData,
@@ -143,16 +147,19 @@ export class NewRequestForm extends React.Component<IWebPartProps, NewRequestFor
                     ApprovalStage: '',
                     Created: '',
                 },
-                gridRows: [{ Id: 1, Supplier: '', Item: '', DeliveryDate: '', UnitPrice: 0, Quantity: 0, Currency: '', TotalPrice: 0 }]
+                gridRows: [{ Id: 1, Supplier: '', Item: '', DeliveryDate: '', UnitPrice: 0, Quantity: 0, Currency: '', TotalPrice: 0 }],
+                isSubmitting: false
             });
             toast.success('Procurement submitted successfully!');
         } catch (error) {
+            this.setState({ isSubmitting: false });
             toast.error('Failed to submit Procurement.', error);
         }
     };
 
     render() {
-        const { Initiator, Department} = this.state.formData;
+        const { Initiator, Department } = this.state.formData;
+        const {gridRows, supplierOptions, isFormValid, isSubmitting } = this.state;
 
         return (
             <div>
@@ -171,8 +178,8 @@ export class NewRequestForm extends React.Component<IWebPartProps, NewRequestFor
                             </div>
                         </div>
                         <EditableGrid
-                            rows={this.state.gridRows}
-                            suppliers={this.state.supplierOptions.map(supplier => supplier.BusinessName)}
+                            rows={gridRows}
+                            suppliers={supplierOptions.map(supplier => supplier.BusinessName)}
                             onAddRow={this.handleGridAddRow}
                             onDeleteRow={this.handleGridDeleteRow}
                             onChangeRow={this.handleGridChangeRow}
@@ -180,7 +187,18 @@ export class NewRequestForm extends React.Component<IWebPartProps, NewRequestFor
                             onGridUpdate={this.handleGridUpdate}
                         />
                         <div className={styles.buttoncontainer}>
-                            <button type="submit" disabled={!this.state.isFormValid}>Submit</button>
+                            {!isSubmitting ? (
+                                <button type="submit" disabled={!isFormValid}>
+                                    <Icon iconName="SkypeCircleCheck" className={styles.buttonicon} /> Submit
+                                </button>
+                            ) : (
+                                <button className={styles.submitingbutton} disabled>
+                                        <div className={styles.loadingcontainer}>
+                                            <div className={styles.loadingbar}></div>
+                                        </div>
+                                    Submiting...
+                                </button>
+                            )}
                         </div>
                     </form>
                 </div>

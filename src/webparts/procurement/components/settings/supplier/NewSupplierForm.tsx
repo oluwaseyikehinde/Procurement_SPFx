@@ -5,6 +5,7 @@ import styles from '../../Procurement.module.scss';
 import { INewSupplierFormFields } from './ISupplierFields';
 import { IWebPartProps } from "../../IProcurementProps";
 import toast from 'react-hot-toast';
+import { Icon } from 'office-ui-fabric-react/lib/Icon';
 
 interface NewSupplierFormProps extends IWebPartProps {
     formData: INewSupplierFormFields & { id: number };
@@ -15,6 +16,7 @@ interface NewSupplierFormProps extends IWebPartProps {
 interface NewSupplierFormState {
     formData: INewSupplierFormFields & { id: number };
     isFormValid: boolean;
+    isSubmitting: boolean;
 }
 
 export class NewSupplierForm extends React.Component<NewSupplierFormProps, NewSupplierFormState> {
@@ -22,7 +24,8 @@ export class NewSupplierForm extends React.Component<NewSupplierFormProps, NewSu
         super(props);
         this.state = {
             formData: this.props.formData,
-            isFormValid: this.isFormValid(this.props.formData)
+            isFormValid: this.isFormValid(this.props.formData),
+            isSubmitting: false
         };
     }
 
@@ -56,6 +59,7 @@ export class NewSupplierForm extends React.Component<NewSupplierFormProps, NewSu
 
     handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        this.setState({ isSubmitting: true });
         if (this.state.isFormValid) {
             this.props.onSupplierSubmit(this.state.formData);
             this.setState({
@@ -67,16 +71,19 @@ export class NewSupplierForm extends React.Component<NewSupplierFormProps, NewSu
                     Email: '',
                     Status: ''
                 },
-                isFormValid: false
+                isFormValid: false,
+                isSubmitting: false
             });
             toast.success('Supplier submitted successfully!');
         } else {
+            this.setState({ isSubmitting: false });
             toast.error('Please fill in all required fields.');
         }
     };
 
     render() {
         const { BusinessName, ContactName, ContactPhone, Email, Status } = this.state.formData;
+        const { editing } = this.props;
 
         return (
             <div>
@@ -116,7 +123,19 @@ export class NewSupplierForm extends React.Component<NewSupplierFormProps, NewSu
                             </div>
                         )}
                         <div className={styles.buttoncontainer}>
-                            <button type="submit" disabled={!this.state.isFormValid}>{this.props.editing ? 'Update' : 'Submit'}</button>
+                            {!this.state.isSubmitting ? (
+                                <button type="submit" disabled={!this.state.isFormValid}>
+                                    <Icon iconName={editing ? "Sync" : "SkypeCircleCheck"} className={styles.buttonicon} />
+                                    {editing ? 'Update' : 'Submit'}
+                                </button>
+                            ) : (
+                                <button className={styles.submitingbutton} disabled>
+                                    <div className={styles.loadingcontainer}>
+                                        <div className={styles.loadingbar}></div>
+                                    </div>
+                                    {editing ? 'Updating...' : 'Submitting...'}
+                                </button>
+                            )}
                         </div>
                     </form>
                 </div>

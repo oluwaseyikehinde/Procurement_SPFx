@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as moment from 'moment';
 import { IApprovalRequestFormFields } from './IApprovalRequestFields';
 import { IWebPartProps } from "../IProcurementProps";
-import { getListItems } from '../utils/sp.utils';
+import { getPendingApprovalRequestListItems } from '../utils/sp.utils';
 import styles from '../Procurement.module.scss';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.min.js';
@@ -10,6 +10,7 @@ import toast from 'react-hot-toast';
 import { listNames } from '../utils/models.utils';
 import Loader from '../loader/Loader';
 import ApprovalRecordDetailView from './ApprovalRecordDetailView';
+import { Icon } from 'office-ui-fabric-react';
 
 interface ListItem extends IApprovalRequestFormFields {
     id: number;
@@ -43,8 +44,8 @@ export class ApprovalRecordsTable extends React.Component<IWebPartProps, Approva
 
     getRecordList = async () => {
         try {
-            // Fetch list items using the getListItems function from ProcurementService
-            const listItems: IApprovalRequestFormFields[] = await getListItems(this.props.context, listNames.request);
+            // Fetch list items using the getPendingApprovalRequestListItems function from ProcurementService
+            const listItems: IApprovalRequestFormFields[] = await getPendingApprovalRequestListItems(this.props.context, listNames.request, listNames.approvers);
             // Transform list items to include an id property
             const recordsWithId = listItems.map((item, index) => ({ ...item, id: index + 1 }));
             this.setState({ records: recordsWithId, loading: false });
@@ -121,7 +122,7 @@ export class ApprovalRecordsTable extends React.Component<IWebPartProps, Approva
                                             className={styles.tablebutton} 
                                             onClick={() => this.handleViewClick(record)}
                                         >
-                                            View
+                                            <Icon iconName="View" className={styles.buttonicon} /> View
                                         </button>
                                     </td>
                                 </tr>

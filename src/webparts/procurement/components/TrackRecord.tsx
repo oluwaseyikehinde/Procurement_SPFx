@@ -3,6 +3,7 @@ import styles from './Procurement.module.scss';
 import { getListItems } from './utils/sp.utils';
 import { listNames } from './utils/models.utils';
 import { IWebPartProps } from './IProcurementProps';
+import { Icon } from 'office-ui-fabric-react';
 
 interface RecordDetailTrackerProps {
     record: any;
@@ -44,11 +45,13 @@ class RecordDetailTracker extends React.Component<RecordDetailTrackerProps, Reco
 
 
     getStatus(level: number) {
-        const { ApprovalStage } = this.props.record;
-        if (ApprovalStage === level) {
+        const { ApprovalStage, ApprovalStatus } = this.props.record;
+        if (ApprovalStage === level && ApprovalStatus === 'Pending') {
             return 'Pending';
-        } else if (ApprovalStage > level) {
+        } else if (ApprovalStage > level || ApprovalStage === level && ApprovalStatus === 'Approved') {
             return 'Approved';
+        } else if (ApprovalStage === level && ApprovalStatus === 'Rejected') {
+            return 'Rejected';
         } else {
             return 'NotStarted';
         }
@@ -62,7 +65,7 @@ class RecordDetailTracker extends React.Component<RecordDetailTrackerProps, Reco
             <div className={styles.overlay}>
                 <div className={styles.modal}>
                         <div>
-                            <button onClick={onClose} className={styles.closeButton}>X</button>
+                            <Icon iconName="ErrorBadge" onClick={onClose} className={styles.closeButton} />
                         </div>
                       {loading ? (
                         <p>Loading approvers...</p>
@@ -72,7 +75,7 @@ class RecordDetailTracker extends React.Component<RecordDetailTrackerProps, Reco
                         <div className={styles.trackerContainer}>
                             {approvers.map((approver, index) => (
                                 <div key={index} className={styles.trackerStep}>
-                                    <div className={`${styles.trackerCircle} ${styles[this.getStatus(approver.Level).toLowerCase() as 'approved' | 'pending' | 'notstarted']}`}>
+                                    <div className={`${styles.trackerCircle} ${styles[this.getStatus(approver.Level).toLowerCase() as 'approved' | 'pending' | 'rejected' | 'notstarted']}`}>
                                    
                                     </div>
                                     <div className={styles.trackerDetails}>

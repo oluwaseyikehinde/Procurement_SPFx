@@ -5,6 +5,7 @@ import { getListItems, approveRequest, rejectRequest } from '../utils/sp.utils';
 import { listNames } from '../utils/models.utils';
 import { IWebPartProps } from '../IProcurementProps';
 import toast from 'react-hot-toast';
+import { Icon } from 'office-ui-fabric-react/lib/Icon';
 
 interface RecordDetailViewProps {
     record: any;
@@ -19,6 +20,8 @@ interface RecordDetailViewState {
     error: string | null;
     comment: string;
     activeApproversCount: number;
+    approvalAction: string | null;
+    isSubmitting: boolean;
 }
 
 class ApprovalRecordDetailView extends React.Component<RecordDetailViewProps, RecordDetailViewState> {
@@ -29,14 +32,16 @@ class ApprovalRecordDetailView extends React.Component<RecordDetailViewProps, Re
             loading: true,
             error: null,
             comment: '',
-            activeApproversCount: 0
+            activeApproversCount: 0,
+            approvalAction: null,
+            isSubmitting: false
         };
     }
 
     async componentDidMount() {
         try {
             const relatedItems = await getListItems(this.props.context, listNames.requestItem);
-            const filteredItems = relatedItems.filter((item: any) => item.ProcurementId === this.props.record.id);
+            const filteredItems = relatedItems.filter((item: any) => item.ProcurementId === this.props.record.Id);
 
             const approvers = await getListItems(this.props.context, listNames.approvers);
             const activeApprovers = approvers.filter(approver => approver.Status === 'Active');
@@ -53,21 +58,24 @@ class ApprovalRecordDetailView extends React.Component<RecordDetailViewProps, Re
 
     handleApprove = async () => {
         try {
+            this.setState({ approvalAction: 'Approve', isSubmitting: true });
             const { context, record, refreshRecords } = this.props;
             const { comment, activeApproversCount } = this.state;
 
             await approveRequest(context, listNames.request, record.Id, comment, activeApproversCount);
             toast.success('Request Approved successfully!');
+            this.setState({ approvalAction: null, isSubmitting: false });
             this.props.onClose();
             refreshRecords();
         } catch (error) {
+            this.setState({ approvalAction: null, isSubmitting: false });
             toast.error('Failed to Approve Procurement Request.', error);
         }
     };
 
     handleReject = async () => {
         const { context, record, refreshRecords } = this.props;
-        const { comment, activeApproversCount } = this.state;
+        const { comment } = this.state;
 
         if (comment.trim() === '') {
             toast.error('Comment is required to reject the request.');
@@ -75,11 +83,14 @@ class ApprovalRecordDetailView extends React.Component<RecordDetailViewProps, Re
         }
 
         try {
-            await rejectRequest(context, listNames.request, record.Id, comment, activeApproversCount);
+            this.setState({ approvalAction: 'Reject', isSubmitting: true });
+            await rejectRequest(context, listNames.request, record.Id, comment);
             toast.success('Request Rejected successfully!');
+            this.setState({ approvalAction: null, isSubmitting: false });
             this.props.onClose();
             refreshRecords();
         } catch (error) {
+            this.setState({ approvalAction: null, isSubmitting: false });
             toast.error('Failed to Reject Procurement Request.', error);
         }
     };
@@ -90,7 +101,7 @@ class ApprovalRecordDetailView extends React.Component<RecordDetailViewProps, Re
 
     render() {
         const { record, onClose } = this.props;
-        const { relatedItems, loading, error, comment } = this.state;
+        const { relatedItems, loading, error, comment, approvalAction, isSubmitting } = this.state;
 
         const formatCurrency = (value: number) => {
             return value.toLocaleString('en-US', {
@@ -105,7 +116,7 @@ class ApprovalRecordDetailView extends React.Component<RecordDetailViewProps, Re
                     <h4>
                         Record Details
                         <span>
-                            <button onClick={onClose} className={styles.closeButton}>X</button>
+                            <Icon iconName="ErrorBadge" onClick={onClose} className={styles.closeButton} />
                         </span>
                     </h4>
                     <div className={styles.modalRecord}>
@@ -159,8 +170,35 @@ class ApprovalRecordDetailView extends React.Component<RecordDetailViewProps, Re
                             />
                         </div>
                         <div className={styles.buttoncontainer}>
-                            <button type='submit' onClick={this.handleApprove}>Approve</button>
-                            <button type='submit' onClick={this.handleReject}>Reject</button>
+                            {!isSubmitting ? (
+                                <>
+                                    <button type="submit" onClick={this.handleApprove}>
+                                        <Icon iconName="Accept" className={styles.buttonicon} /> Approve
+                                    </button>
+                                    <button type="submit" onClick={this.handleReject}>
+                                        <Icon iconName="Cancel" className={styles.buttonicon} /> Reject
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    {approvalAction === 'Approve' && (
+                                        <button className={styles.submitingbutton} disabled>
+                                            <div className={styles.loadingcontainer}>
+                                                <div className={styles.loadingbar}></div>
+                                            </div>
+                                            Approving...
+                                        </button>
+                                    )}
+                                    {approvalAction === 'Reject' && (
+                                        <button className={styles.submitingbutton} disabled>
+                                            <div className={styles.loadingcontainer}>
+                                                <div className={styles.loadingbar}></div>
+                                            </div>
+                                            Rejecting...
+                                        </button>
+                                    )}
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>

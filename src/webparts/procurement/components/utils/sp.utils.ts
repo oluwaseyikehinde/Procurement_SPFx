@@ -86,6 +86,49 @@ export const deleteMyRequestListItem = async (context: any, listName: string, it
     }
 };
 
+// export const getPendingApprovalRequestListItems = async (context: any, listName: string) => {
+//     try {
+//         const sp = spfi().using(spSPFx(context));
+
+
+//         // Fetch list items filtered by the current user's email
+//         const items = await sp.web.lists.getByTitle(listName).items.filter(`ApprovalStatus eq 'Pending'`)();
+//         return items;
+//     } catch (error) {
+//         console.error('Error getting list items:', error);
+//         throw error;
+//     }
+// };
+
+export const getPendingApprovalRequestListItems = async (context: any, requestListName: string, approverListName: string) => {
+    try {
+        const sp = spfi().using(spSPFx(context));
+
+        // Get the current user's data
+        const currentUser = await getLoggedInUserData(context);
+        const userEmail = currentUser.mail;
+
+        // Fetch approvers list filtered by the current user's email
+        const approvers = await sp.web.lists.getByTitle(approverListName).items.filter(`Email eq '${userEmail}' and Status eq 'Active'`)();
+
+        // Extract approver levels where the current user is an approver
+        const approverLevels = approvers.map(approver => approver.Level);
+
+        if (approverLevels.length === 0) {
+            return []; // No pending approvals if the user is not an approver at any level
+        }
+
+        // Fetch request list items filtered by pending status and matching approval stages
+        const filterConditions = approverLevels.map(level => `ApprovalStage eq ${level}`).join(' or ');
+        const items = await sp.web.lists.getByTitle(requestListName).items.filter(`ApprovalStatus eq 'Pending' and (${filterConditions})`)();
+
+        return items;
+    } catch (error) {
+        console.error('Error getting pending approval request list items:', error);
+        throw error;
+    }
+};
+
 export const getListItems = async (context: any, listName: string) => {
     try {
         const sp = spfi().using(spSPFx(context));
@@ -132,7 +175,6 @@ export const createListItem = async (context: any, listName: string, itemPropert
 export const updateListItem = async (context: any, listName: string, itemId: number, itemProperties: any) => {
     try {
         const sp = spfi().using(spSPFx(context));
-        console.log("rrrrrrrrrrrrrrrr",itemProperties)
         await sp.web.lists.getByTitle(listName).items.getById(itemId).update(itemProperties);
 
         // Get the initiator's full name and email
@@ -210,8 +252,8 @@ export const approveRequest = async (context: any, listName: string, itemId: num
 
         // Determine the next approval status and stage
         const nextApprovalStage = currentApprovalStage + 1;
-        const approvalStatus = nextApprovalStage < activeApproversCount ? 'Pending' : 'Approved';
-        const approvalStage = nextApprovalStage < activeApproversCount ? nextApprovalStage : currentApprovalStage;
+        const approvalStatus = nextApprovalStage > activeApproversCount ? 'Approved' : 'Pending';
+        const approvalStage = nextApprovalStage > activeApproversCount ? currentApprovalStage : nextApprovalStage;
 
         // Update the item's ApprovalStatus
         await sp.web.lists.getByTitle(listName).items.getById(itemId).update({
@@ -239,7 +281,7 @@ export const approveRequest = async (context: any, listName: string, itemId: num
 };
 
 
-export const rejectRequest = async (context: any, listName: string, itemId: number, comment: string, activeApproversCount: number) => {
+export const rejectRequest = async (context: any, listName: string, itemId: number, comment: string) => {
     try {
         const sp = spfi().using(spSPFx(context));
 
@@ -255,14 +297,12 @@ export const rejectRequest = async (context: any, listName: string, itemId: numb
         const currentDate = moment().format('YYYY-MM-DDTHH:mm:ssZ');
 
         // Determine the next approval status and stage
-        const nextApprovalStage = currentApprovalStage + 1;
-        const approvalStatus = nextApprovalStage < activeApproversCount ? 'Pending' : 'Rejected';
-        const approvalStage = nextApprovalStage < activeApproversCount ? nextApprovalStage : currentApprovalStage;
+        const approvalStatus = 'Rejected';
 
         // Update the item's ApprovalStatus
         await sp.web.lists.getByTitle(listName).items.getById(itemId).update({
             ApprovalStatus: approvalStatus,
-            ApprovalStage: approvalStage
+            ApprovalStage: currentApprovalStage
         });
 
         // Log the action in the audit log
