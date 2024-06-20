@@ -67,7 +67,7 @@ export class NewRoleForm extends React.Component<NewRoleFormProps, NewRoleFormSt
                     id: 0,
                     Role: '',
                     Description: '',
-                    Status: ''
+                    Status: 'Active'
                 },
                 isFormValid: false,
                 isSubmitting: false

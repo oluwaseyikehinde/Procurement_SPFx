@@ -148,7 +148,8 @@ export class NewRequestForm extends React.Component<IWebPartProps, NewRequestFor
                     Created: '',
                 },
                 gridRows: [{ Id: 1, Supplier: '', Item: '', DeliveryDate: '', UnitPrice: 0, Quantity: 0, Currency: '', TotalPrice: 0 }],
-                isSubmitting: false
+                isSubmitting: false,
+                isFormValid: false
             });
             toast.success('Procurement submitted successfully!');
         } catch (error) {

@@ -112,7 +112,7 @@ export class NewApproverForm extends React.Component<NewApproverFormProps, NewAp
                         Role: '',
                         Level: 0,
                         Email: '',
-                        Status: ''
+                        Status: 'Active'
                     },
                     selectedPeople: [],
                     isFormValid: false,

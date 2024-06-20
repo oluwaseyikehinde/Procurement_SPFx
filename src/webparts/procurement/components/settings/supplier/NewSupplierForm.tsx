@@ -69,7 +69,7 @@ export class NewSupplierForm extends React.Component<NewSupplierFormProps, NewSu
                     ContactName: '',
                     ContactPhone: '',
                     Email: '',
-                    Status: ''
+                    Status: 'Active'
                 },
                 isFormValid: false,
                 isSubmitting: false

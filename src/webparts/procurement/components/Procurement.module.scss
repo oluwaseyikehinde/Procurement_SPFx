@@ -350,19 +350,27 @@ button[type="submit"][disabled] {
 }
 
 .approved {
-  background-color: green;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2.5em' height='2em' viewBox='0 0 24 24'%3E%3Cpath fill='%235ed98d' d='m21.1 12.5l1.4 1.41l-6.53 6.59L12.5 17l1.4-1.41l2.07 2.08zM10 17l3 3H3v-2c0-2.21 3.58-4 8-4l1.89.11zm1-13a4 4 0 0 1 4 4a4 4 0 0 1-4 4a4 4 0 0 1-4-4a4 4 0 0 1 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  margin-left: 3px;
 }
-
+ 
 .pending {
-  background-color: orange;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2.5em' height='2em' viewBox='0 0 24 24'%3E%3Cpath fill='%23e6ce56' d='M10.63 14.1a7 7 0 0 1 9.27-3.47a7 7 0 0 1 3.47 9.27A6.98 6.98 0 0 1 17 24c-2.7 0-5.17-1.56-6.33-4H1v-2c.06-1.14.84-2.07 2.34-2.82S6.72 14.04 9 14c.57 0 1.11.05 1.63.1M9 4c1.12.03 2.06.42 2.81 1.17S12.93 6.86 12.93 8s-.37 2.08-1.12 2.83s-1.69 1.12-2.81 1.12s-2.06-.37-2.81-1.12S5.07 9.14 5.07 8s.37-2.08 1.12-2.83S7.88 4.03 9 4m8 18a5 5 0 0 0 5-5a5 5 0 0 0-5-5a5 5 0 0 0-5 5a5 5 0 0 0 5 5m-1-8h1.5v2.82l2.44 1.41l-.75 1.3L16 17.69z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  margin-left: 3px;
 }
-
+ 
 .notstarted {
-  background-color: grey;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2.5em' height='2em' viewBox='0 0 16 16'%3E%3Cpath fill='%23808080' d='M13.879 10.414a2.501 2.501 0 0 0-3.465 3.465zm.707.707l-3.465 3.465a2.501 2.501 0 0 0 3.465-3.465m-4.56-1.096a3.5 3.5 0 1 1 4.949 4.95a3.5 3.5 0 0 1-4.95-4.95ZM11 5a3 3 0 1 1-6 0a3 3 0 0 1 6 0M8 7a2 2 0 1 0 0-4a2 2 0 0 0 0 4m.256 7a4.5 4.5 0 0 1-.229-1.004H3c.001-.246.154-.986.832-1.664C4.484 10.68 5.711 10 8 10q.39 0 .74.025c.226-.341.496-.65.804-.918Q8.844 9.002 8 9c-5 0-6 3-6 4s1 1 1 1z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  margin-left: 3px;
 }
 
 .rejected {
-  background-color: red;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2.5em' height='2em' viewBox='0 0 24 24'%3E%3Cpath fill='%23cf142b' d='M17.5 12a5.5 5.5 0 1 1 0 11a5.5 5.5 0 0 1 0-11m-5.477 2a6.5 6.5 0 0 0-.709 1.5h-7.06a.75.75 0 0 0-.75.75v.907c0 .656.286 1.28.783 1.707C5.545 19.945 7.441 20.5 10 20.5q.9 0 1.688-.09c.25.5.563.963.93 1.38Q11.413 22 10 22c-2.89 0-5.128-.656-6.69-2a3.75 3.75 0 0 1-1.306-2.844v-.907A2.25 2.25 0 0 1 4.254 14zm3.07.966l-.069.058l-.058.07a.5.5 0 0 0 0 .568l.058.07l1.77 1.769l-1.767 1.767l-.058.069a.5.5 0 0 0 0 .569l.058.069l.069.058a.5.5 0 0 0 .569 0l.069-.058l1.767-1.767l1.769 1.77l.069.057a.5.5 0 0 0 .569 0l.069-.058l.058-.07a.5.5 0 0 0 0-.568l-.058-.069l-1.77-1.77l1.773-1.768l.058-.07a.5.5 0 0 0 0-.568l-.058-.07l-.07-.057a.5.5 0 0 0-.568 0l-.07.057l-1.771 1.77l-1.77-1.77l-.069-.057a.5.5 0 0 0-.492-.044zM10 2.005a5 5 0 1 1 0 10a5 5 0 0 1 0-10m0 1.5a3.5 3.5 0 1 0 0 7a3.5 3.5 0 0 0 0-7'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  margin-left: 3px;
 }
 
 .trackerDetails {

@@ -77,7 +77,7 @@ export class NewItemForm extends React.Component<NewItemFormProps, NewItemFormSt
                     Item: '',
                     Currency: '',
                     Price: 0,
-                    Status: ''
+                    Status: 'Active'
                 },
                 isFormValid: false,
                 isSubmitting: false

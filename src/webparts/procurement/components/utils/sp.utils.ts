@@ -2,14 +2,46 @@ import { SPFx as spSPFx, spfi } from "@pnp/sp";
 import "@pnp/sp/webs";
 import "@pnp/sp/lists";
 import "@pnp/sp/items";
-import { getLoggedInUserData } from "./graph.utils";
+import { getLoggedInUserData, sendEmail } from "./graph.utils";
 import { listNames } from "./models.utils";
 import * as moment from 'moment';
+
 
 export const getSPClient = (context: any) => {
     return spfi().using(spSPFx(context));
 }
 
+// Function to format line items as a table for email body
+const formatLineItemsTable = (lineItems: any[]) => {
+    const tableHeader = `
+    <tr>
+        <th>Supplier</th>
+        <th>Item</th>
+        <th>Delivery Date</th>
+        <th>Quantity</th>
+        <th>Unit Price</th>
+        <th>Total Price</th>
+    </tr>`;
+
+    const formatCurrency = (value: number) => {
+        return value.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    };
+
+    const tableRows = lineItems.map(item => `
+        <tr>
+            <td>${item.Supplier}</td>
+            <td>${item.Item}</td>
+            <td>${moment(item.DeliveryDate).format('DD-MMM-YYYY')}</td>
+            <td>${item.Quantity}</td>
+            <td>${item.Currency}${formatCurrency(item.UnitPrice)}</td>
+            <td>${item.Currency}${formatCurrency(item.Quantity * item.UnitPrice)}</td>
+        </tr>`).join('');
+
+    return `<table border="1" >${tableHeader}${tableRows}</table>`;
+};
 
 export const getMyRequestListItems = async (context: any, listName: string) => {
     try {
@@ -43,9 +75,9 @@ export const createMyRequestListItem = async (context: any, listName: string, li
         
 
         // Save each grid row to the Procurement Item List
+        let gridItemPropertiesArray: any[] = [];
         if (itemProperties.gridRows && itemProperties.gridRows.length > 0) {
             const gridItemsPromises = itemProperties.gridRows.map(async (gridRow: any) => {
-                //const gridItemProperties = { ...gridRow, ProcurementId: ProcurementId };
                 // Omit TotalPrice and Id from grid row properties
                 const { TotalPrice, Id, ...gridItemProperties } = gridRow;
 
@@ -54,9 +86,40 @@ export const createMyRequestListItem = async (context: any, listName: string, li
 
                 // Add grid row to Procurement Item List
                 await sp.web.lists.getByTitle(listItemName).items.add(gridItemProperties);
+                gridItemPropertiesArray.push(gridItemProperties);
             });
             await Promise.all(gridItemsPromises);
         }
+
+        // Get current lineItem Records
+        const lineItemsTable = formatLineItemsTable(gridItemPropertiesArray);
+        // Get current approver's email
+        const approvers = await sp.web.lists.getByTitle(listNames.approvers).items.filter(`Level eq ${ApprovalStage} and Status eq 'Active'`)();
+        const currentApproverEmail = approvers[0].Email;
+        const currentApproverPersonnel = approvers[0].Personnel;
+        const currentApproverRole = approvers[0].Role;
+        
+        if (approvers.length > 0) {
+        // Send email notification to initiator
+        const initiatorSubject = "New Procurement Request Created";
+        const initiatorBody = `<p>Your request has been successfully created and sent for approval to ${currentApproverPersonnel} (${currentApproverRole}).</p>
+                               <p></p>
+                               <p>Regards</p>`;
+        await sendEmail(context, [Email], initiatorSubject, initiatorBody);
+
+
+
+            // Send email notification to current approver
+            const approverSubject = "New Request Pending Approval";
+            const approverBody = `<p>A new request is pending your approval.</p>
+                                  <p>Details:</p>
+                                  <p>Initiator: ${Initiator}</p>
+                                  <p>Department: ${Department}</p>
+                                  ${lineItemsTable}`;
+            await sendEmail(context, [currentApproverEmail], approverSubject, approverBody);
+        }
+
+
 
        return newItem.data;
     } catch (error) {
@@ -64,41 +127,6 @@ export const createMyRequestListItem = async (context: any, listName: string, li
         throw error;
     }
 };
-
-
-export const updateMyRequestListItem = async (context: any, listName: string, itemId: number, itemProperties: any) => {
-    try {
-        const sp = spfi().using(spSPFx(context));
-        await sp.web.lists.getByTitle(listName).items.getById(itemId).update(itemProperties);
-    } catch (error) {
-        console.error('Error updating list item:', error);
-        throw error;
-    }
-};
-
-export const deleteMyRequestListItem = async (context: any, listName: string, itemId: number) => {
-    try {
-        const sp = spfi().using(spSPFx(context));
-        await sp.web.lists.getByTitle(listName).items.getById(itemId).delete();
-    } catch (error) {
-        console.error('Error deleting list item:', error);
-        throw error;
-    }
-};
-
-// export const getPendingApprovalRequestListItems = async (context: any, listName: string) => {
-//     try {
-//         const sp = spfi().using(spSPFx(context));
-
-
-//         // Fetch list items filtered by the current user's email
-//         const items = await sp.web.lists.getByTitle(listName).items.filter(`ApprovalStatus eq 'Pending'`)();
-//         return items;
-//     } catch (error) {
-//         console.error('Error getting list items:', error);
-//         throw error;
-//     }
-// };
 
 export const getPendingApprovalRequestListItems = async (context: any, requestListName: string, approverListName: string) => {
     try {
@@ -234,7 +262,6 @@ export const deleteListItem = async (context: any, listName: string, itemId: num
     }
 };
 
-
 export const approveRequest = async (context: any, listName: string, itemId: number, comment: string, activeApproversCount: number) => {
     try {
         const sp = spfi().using(spSPFx(context));
@@ -247,6 +274,10 @@ export const approveRequest = async (context: any, listName: string, itemId: num
         // Get the current item to determine the current ApprovalStage
         const currentItem = await sp.web.lists.getByTitle(listName).items.getById(itemId)();
         const currentApprovalStage = currentItem.ApprovalStage || 0;
+
+        // Fetch line items from Procurement Item list
+        const lineItems = await sp.web.lists.getByTitle(listNames.requestItem).items.filter(`ProcurementId eq ${itemId}`)();
+        const lineItemsTable = formatLineItemsTable(lineItems);
 
         const currentDate = moment().format('YYYY-MM-DDTHH:mm:ssZ');
 
@@ -274,12 +305,48 @@ export const approveRequest = async (context: any, listName: string, itemId: num
             ListName: listName
         });
 
+        // Get the current approver details
+        const currentApprover = await sp.web.lists.getByTitle(listNames.approvers).items.filter(`Level eq ${currentApprovalStage} and Status eq 'Active'`)();
+        const currentApproverPersonnel = currentApprover[0].Personnel;
+        const currentApproverRole = currentApprover[0].Role;
+
+        // Get the next approver details if there is any
+        const nextApprover = await sp.web.lists.getByTitle(listNames.approvers).items.filter(`Level eq ${nextApprovalStage} and Status eq 'Active'`)();
+
+        if (nextApprover.length > 0) {
+            // There is a next approver
+            const nextApproverEmail = nextApprover[0].Email;
+            const nextApproverPersonnel = nextApprover[0].Personnel;
+            const nextApproverRole = nextApprover[0].Role;
+
+            // Send email notification to initiator
+            const initiatorSubject = "Request Approved";
+            const initiatorBody = `<p>Your request has been approved by the ${currentApproverRole} (${currentApproverPersonnel}) and sent to the ${nextApproverRole} (${nextApproverPersonnel}).</p>
+                                   <p>Comment: ${comment || 'No Comment'}</p>`;
+            await sendEmail(context, [currentItem.Email], initiatorSubject, initiatorBody);
+
+            // Send email notification to next approver
+            const approverSubject = "New Request Pending Approval";
+            const approverBody = `<p>A request is pending your approval.</p>
+                                  <p>Details:</p>
+                                  <p>Initiator: ${currentItem.Initiator}</p>
+                                  <p>Department: ${currentItem.Department}</p>
+                                  <p>Comment: ${comment || 'No Comment'}</p>
+                                  ${lineItemsTable}`;
+            await sendEmail(context, [nextApproverEmail], approverSubject, approverBody);
+        } else {
+            // No next approver, notify initiator
+            const initiatorSubject = "Request Approved";
+            const initiatorBody = `<p>Your request has been approved by the ${currentApproverRole} (${currentApproverPersonnel}) and is pending no further approval.</p>
+                                   <p>Comment: ${comment || 'No Comment'}</p>`;
+            await sendEmail(context, [currentItem.Email], initiatorSubject, initiatorBody);
+        }
+
     } catch (error) {
         console.error('Error approving request:', error);
         throw error;
     }
 };
-
 
 export const rejectRequest = async (context: any, listName: string, itemId: number, comment: string) => {
     try {
@@ -293,6 +360,10 @@ export const rejectRequest = async (context: any, listName: string, itemId: numb
         // Get the current item to determine the current ApprovalStage
         const currentItem = await sp.web.lists.getByTitle(listName).items.getById(itemId)();
         const currentApprovalStage = currentItem.ApprovalStage || 0;
+
+        // Fetch line items from Procurement Item list
+        const lineItems = await sp.web.lists.getByTitle(listNames.requestItem).items.filter(`ProcurementId eq ${itemId}`)();
+        const lineItemsTable = formatLineItemsTable(lineItems);
 
         const currentDate = moment().format('YYYY-MM-DDTHH:mm:ssZ');
 
@@ -318,9 +389,34 @@ export const rejectRequest = async (context: any, listName: string, itemId: numb
             ListName: listName
         });
 
+        const currentApprover = await sp.web.lists.getByTitle(listNames.approvers).items.filter(`Level eq ${currentApprovalStage} and Status eq 'Active'`)();
+        const currentApproverPersonnel = currentApprover[0].Personnel;
+        const currentApproverRole = currentApprover[0].Role;
+        const currentApproverEmail = currentApprover[0].Email;
+        
+        if (currentApprover.length > 0) {
+        // Send email notification to initiator
+        const initiatorSubject = "Request Rejected";
+        const initiatorBody = `<p>Your request has been rejected the ${currentApproverRole} (${currentApproverPersonnel}).</p>
+                               <p></p>
+                               <p>Comment: ${comment}</p>
+                               <p></p>
+                               ${lineItemsTable}`;
+        await sendEmail(context, [currentItem.Email], initiatorSubject, initiatorBody);
+
+        // Send email notification to current approver
+        const approverSubject = "Request Rejected";
+            const approverBody = `<p>A request you has been rejected.</p>
+                                  <p>Details:</p>
+                                  <p>Initiator: ${currentItem.Initiator}</p>
+                                  <p>Department: ${currentItem.Department}</p>
+                                  <p>Comment: ${comment}</p>
+                                  ${lineItemsTable}`;
+            await sendEmail(context, [currentApproverEmail], approverSubject, approverBody);
+        }
+
     } catch (error) {
         console.error('Error rejecting request:', error);
         throw error;
     }
 };
-
