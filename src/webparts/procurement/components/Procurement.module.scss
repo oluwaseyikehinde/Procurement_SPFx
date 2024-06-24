@@ -25,7 +25,6 @@ label {
   font-weight: 400;
 }
 
-
 .tableform {
   border-radius: 0;
   font-size: 10px;
@@ -57,6 +56,7 @@ label {
 }
 
 table {
+  background: #f2f2f2;
 
   thead {
     background-color: #3b72d8 !important;
@@ -261,6 +261,22 @@ button[type="submit"][disabled] {
   }
 }
 
+.searchbutton {
+  background-color: #3b72d8;
+  color: #fff;
+  border: none;
+  border-radius: 0px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.3s ease;
+  width: 70px;
+  height: 35px;
+
+  &:hover {
+    background-color: #0056b3;
+  }
+}
+
 .buttonicon {
   margin-right: 5px;
   vertical-align: middle;
@@ -274,6 +290,15 @@ button[type="submit"][disabled] {
   font-weight: 500;
   font-size: 18px;
   text-align: center;
+}
+
+.filtercontainer {
+  display: flex;
+  justify-content: end;
+  align-items: center;
+  align-content: center;
+  background: #f2f2f2;
+  padding: 5px;
 }
 
 .overlay {

@@ -27,6 +27,10 @@ interface RecordsTableState {
     showTracker: boolean;
     currentPage: number;
     itemsPerPage: number;
+    sortDirection: 'asc' | 'desc';
+    filterStatus: string;
+    searchQuery: string;
+    tempSearchQuery: string;
 }
 
 export class RecordsTable extends React.Component<IWebPartProps, RecordsTableState> {
@@ -40,7 +44,11 @@ export class RecordsTable extends React.Component<IWebPartProps, RecordsTableSta
             showView: false,
             showTracker: false,
             currentPage: 1,
-            itemsPerPage: 10
+            itemsPerPage: 10,
+            sortDirection: 'desc',
+            filterStatus: 'All',
+            searchQuery: '',
+            tempSearchQuery: ''
         };
     }
 
@@ -50,7 +58,8 @@ export class RecordsTable extends React.Component<IWebPartProps, RecordsTableSta
             const listItems: INewRequestFormFields[] = await getMyRequestListItems(this.props.context, listNames.request);
             // Transform list items to include an id property
             const recordsWithId = listItems.map((item, index) => ({ ...item, id: index + 1 }));
-            this.setState({ records: recordsWithId, loading: false });
+            const sortedRecords = recordsWithId.sort((a, b) => new Date(b.Created).getTime() - new Date(a.Created).getTime());
+            this.setState({ records: sortedRecords, loading: false });
         } catch (error) {
             this.setState({ error: 'Failed to load records', loading: false });
             toast.error('Failed to retrieve your procurement request(s). ', error);
@@ -78,37 +87,99 @@ export class RecordsTable extends React.Component<IWebPartProps, RecordsTableSta
         this.setState({ selectedRecord: null, showTracker: false, showView: false });
     };
 
+    handleSort = () => {
+        const { sortDirection, records } = this.state;
+        const newSortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+        const sortedRecords = [...records].sort((a, b) => {
+            const dateAsc = new Date(a.Created).getTime();
+            const dateDesc = new Date(b.Created).getTime();
+            return newSortDirection === 'asc' ? dateAsc - dateDesc : dateDesc - dateAsc;
+        });
+        this.setState({ records: sortedRecords, sortDirection: newSortDirection });
+    };
+
+    handleFilterChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        this.setState({ filterStatus: event.target.value });
+    };
+
+    handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        this.setState({ tempSearchQuery: event.target.value });
+    };
+
+    handleSearch = () => {
+        this.setState(prevState => ({
+            searchQuery: prevState.tempSearchQuery,
+            currentPage: 1
+        }));
+    };
+
+    getFilteredRecords = () => {
+        const { records, filterStatus, searchQuery } = this.state;
+        let filteredRecords = records;
+
+        if (filterStatus !== 'All') {
+            filteredRecords = filteredRecords.filter(record => record.ApprovalStatus === filterStatus);
+        }
+
+        if (searchQuery) {
+            filteredRecords = filteredRecords.filter(record =>
+                record.Initiator.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                record.Department.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+        }
+
+        return filteredRecords;
+    };
+
+
     render() {
-        const { records, loading, error, selectedRecord, showView, showTracker, currentPage, itemsPerPage } = this.state;
+        const { loading, selectedRecord, showView, showTracker, currentPage, itemsPerPage, sortDirection, filterStatus, tempSearchQuery } = this.state;
+
+        // Calculate the current records to display
+        const filteredRecords = this.getFilteredRecords();
+        const indexOfLastRecord = currentPage * itemsPerPage;
+        const indexOfFirstRecord = indexOfLastRecord - itemsPerPage;
+        const currentRecords = filteredRecords.slice(indexOfFirstRecord, indexOfLastRecord);
+
+        // Calculate page numbers
+        const pageNumbers = [];
+        for (let i = 1; i <= Math.ceil(filteredRecords.length / itemsPerPage); i++) {
+            pageNumbers.push(i);
+        }
 
         if (loading) {
             return <Loader/>;
         }
 
-        if (error) {
-            return <div className={styles.centereddiv}>Error: {error}</div>;
-        }
-
-        if (records.length === 0) {
-            return <div className={styles.centereddiv}>No records found</div>;
-        }
-
-        // Calculate the current records to display
-        const indexOfLastRecord = currentPage * itemsPerPage;
-        const indexOfFirstRecord = indexOfLastRecord - itemsPerPage;
-        const currentRecords = records.slice(indexOfFirstRecord, indexOfLastRecord);
-
-        // Calculate page numbers
-        const pageNumbers = [];
-        for (let i = 1; i <= Math.ceil(records.length / itemsPerPage); i++) {
-            pageNumbers.push(i);
-        }
-
 
         return (
             <div>
+                <div className={styles.filtercontainer}>
+                    <div style={{ cursor: 'pointer' }}>
+                        <Icon iconName={sortDirection === 'asc' ? 'SortUp' : 'SortDown'} onClick={this.handleSort} />
+                    </div>
+                    <div>
+                        <select id="filterStatus" className="form-control" value={filterStatus} onChange={this.handleFilterChange}>
+                            <option value="All">All</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Approved">Approved</option>
+                            <option value="Rejected">Rejected</option>
+                        </select>
+                    </div>
+                    <div>
+                        <div className="input-group">
+                            <input type="text" id="searchQuery" className="form-control" value={tempSearchQuery} onChange={this.handleSearchChange} />
+                            <div className="input-group-append">
+                                <button className={styles.searchbutton} type="button" onClick={this.handleSearch}>Search</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <h6 className={styles.mainheader}>Records Table</h6>
                 <hr />
+                {filteredRecords.length === 0 ? (
+                    <div className={styles.centereddiv}>No records found</div>
+                ) : (
                 <div className={styles.sectioncontainer}>
                     <table className="table table-striped">
                         <thead>
@@ -151,6 +222,7 @@ export class RecordsTable extends React.Component<IWebPartProps, RecordsTableSta
                         </ul>
                     </nav>
                 </div>
+                )}
                 {selectedRecord && showView &&  (
                     <RecordDetailView 
                         record={selectedRecord}
