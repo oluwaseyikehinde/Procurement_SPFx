@@ -49,7 +49,7 @@ export class Approver extends React.Component<IWebPartProps, ApproverState> {
             const roleOptions = activeRoles.map((role: any) => ({ ID: role.ID, Role: role.Role }));
 
             const listItems = await getListItems(this.props.context, listNames.approvers);
-            const recordsWithId = listItems.map((item, index) => ({ ...item, id: index + 1 }));
+            const recordsWithId = listItems.map(item => ({ ...item, id: item.Id })); 
             this.setState({ records: recordsWithId, loading: false, roleOptions });
         } catch (error) {
             this.setState({ error: 'Failed to load records', loading: false });

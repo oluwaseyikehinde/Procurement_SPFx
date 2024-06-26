@@ -6,9 +6,10 @@ import { Role } from './role/Role';
 import { Supplier } from './supplier/Supplier';
 import { Approver } from './approver/Approver';
 import { Item } from './item/Item';
+import { Admin } from './admin/Admin';
 
 interface SettingsState {
-    activeScreen: 'supplier' | 'role' | 'approver' | 'item';
+    activeScreen: 'supplier' | 'role' | 'approver' | 'item' | 'admin';
 }
 
 export class Settings extends React.Component<IWebPartProps, SettingsState> {
@@ -19,7 +20,7 @@ export class Settings extends React.Component<IWebPartProps, SettingsState> {
         };
     }
 
-    toggleView = (activeScreen: 'supplier' | 'item' | 'role' | 'approver') => {
+    toggleView = (activeScreen: 'supplier' | 'role' | 'approver' | 'item' | 'admin') => {
         this.setState({ activeScreen });
     };
 
@@ -33,11 +34,13 @@ export class Settings extends React.Component<IWebPartProps, SettingsState> {
                     <button className={`${navstyles.subnav} ${activeScreen === 'item' ? navstyles.active : ''}`} onClick={() => this.toggleView('item')}>Item</button>
                     <button className={`${navstyles.subnav} ${activeScreen === 'role' ? navstyles.active : ''}`} onClick={() => this.toggleView('role')}>Role</button>
                     <button className={`${navstyles.subnav} ${activeScreen === 'approver' ? navstyles.active : ''}`} onClick={() => this.toggleView('approver')}>Approver</button>
+                    <button className={`${navstyles.subnav} ${activeScreen === 'admin' ? navstyles.active : ''}`} onClick={() => this.toggleView('admin')}>Admin</button>
                 </div>
                 {activeScreen === 'supplier' && <Supplier context={this.props.context} />}
                 {activeScreen === 'item' && <Item context={this.props.context} />}
                 {activeScreen === 'role' && <Role context={this.props.context} />}
                 {activeScreen === 'approver' && <Approver context={this.props.context} />}
+                {activeScreen === 'admin' && <Admin context={this.props.context} />}
             </div>
         );
     }

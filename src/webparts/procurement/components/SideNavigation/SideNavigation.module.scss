@@ -21,6 +21,7 @@
     color: #6c757d;
     font-weight: 500;
     transition: box-shadow .2s;
+
     &:hover {
         color: #000;
         font-weight: bold;
@@ -29,7 +30,8 @@
 
 .active {
     font-weight: bold;
-    color: #0078d4; 
+    color: #0078d4;
+    text-decoration: underline;
 }
 
 .menuicons {
@@ -51,15 +53,17 @@
 .subnav {
     display: flex;
     align-items: center;
-    width: 60px;
+    width: auto;
     padding: 4px;
     color: #000;
     border: none;
     cursor: pointer;
     font-size: 12px;
     transition: background-color 0.3s ease;
+
     &:hover {
         color: #3498db;
+        text-decoration: underline;
     }
 }
 

@@ -40,7 +40,7 @@ export class Role extends React.Component<IWebPartProps, RoleState> {
         this.setState({ loading: true, error: null });
         try {
             const listItems = await getListItems(this.props.context, listNames.roles);
-            const recordsWithId = listItems.map((item, index) => ({ ...item, id: index + 1 }));
+           const recordsWithId = listItems.map(item => ({ ...item, id: item.Id })); 
             this.setState({ records: recordsWithId, loading: false });
         } catch (error) {
             this.setState({ error: 'Failed to load records', loading: false });

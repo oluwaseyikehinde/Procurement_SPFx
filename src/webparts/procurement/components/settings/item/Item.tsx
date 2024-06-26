@@ -49,7 +49,7 @@ export class Item extends React.Component<IWebPartProps, ItemState> {
             const supplierOptions = activeSuppliers.map((supplier: any) => ({ ID: supplier.ID, BusinessName: supplier.BusinessName }));
 
             const listItems = await getListItems(this.props.context, listNames.items);
-            const recordsWithId = listItems.map((item, index) => ({ ...item, id: index + 1 }));
+            const recordsWithId = listItems.map(item => ({ ...item, id: item.Id })); 
             this.setState({ records: recordsWithId, loading: false, supplierOptions });
         } catch (error) {
             this.setState({ error: 'Failed to load records', loading: false });

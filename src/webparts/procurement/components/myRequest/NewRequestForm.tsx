@@ -35,15 +35,15 @@ export class NewRequestForm extends React.Component<IWebPartProps, NewRequestFor
                 Created: '',
             },
             gridRows: [{ Id: 1, Supplier: '', Item: '', DeliveryDate: '', UnitPrice: 0, Quantity: 0, Currency: '', TotalPrice: 0 }],
-              supplierOptions: [],
-              isFormValid:false,
-              isSubmitting: false
+            supplierOptions: [],
+            isFormValid: false,
+            isSubmitting: false
         };
     }
 
     async componentDidMount() {
         try {
-             // Fetch Current User
+            // Fetch Current User
             const currentUser = await getLoggedInUserData(this.props.context);
             // Fetch Supplier List
             const suppliers = await getListItems(this.props.context, listNames.suppliers);
@@ -160,7 +160,7 @@ export class NewRequestForm extends React.Component<IWebPartProps, NewRequestFor
 
     render() {
         const { Initiator, Department } = this.state.formData;
-        const {gridRows, supplierOptions, isFormValid, isSubmitting } = this.state;
+        const { gridRows, supplierOptions, isFormValid, isSubmitting } = this.state;
 
         return (
             <div>
@@ -169,11 +169,11 @@ export class NewRequestForm extends React.Component<IWebPartProps, NewRequestFor
                 <div className={styles.sectioncontainer}>
                     <form onSubmit={this.handleSubmit}>
                         <div className={styles.customRow}>
-                            <div className={styles.customCol}>
+                            <div className={styles.customColLeft}>
                                 <label>Initiator <span className={styles.labeltag}>. . . . . . . . . . </span></label>
                                 <input className={styles.formcontrol} type="text" name="Initiator" value={Initiator} onChange={this.handleInputChange} disabled />
                             </div>
-                            <div className={styles.customCol}>
+                            <div className={styles.customColRight}>
                                 <label>Department <span className={styles.labeltag}>. . . . . . </span></label>
                                 <input className={styles.formcontrol} type="text" name="Department" value={Department} onChange={this.handleInputChange} disabled />
                             </div>
@@ -194,9 +194,9 @@ export class NewRequestForm extends React.Component<IWebPartProps, NewRequestFor
                                 </button>
                             ) : (
                                 <button className={styles.submitingbutton} disabled>
-                                        <div className={styles.loadingcontainer}>
-                                            <div className={styles.loadingbar}></div>
-                                        </div>
+                                    <div className={styles.loadingcontainer}>
+                                        <div className={styles.loadingbar}></div>
+                                    </div>
                                     Submiting...
                                 </button>
                             )}

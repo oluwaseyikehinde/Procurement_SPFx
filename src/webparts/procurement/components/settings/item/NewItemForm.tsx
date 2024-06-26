@@ -99,8 +99,8 @@ export class NewItemForm extends React.Component<NewItemFormProps, NewItemFormSt
                 <div className={styles.sectioncontainer}>
                     <form onSubmit={this.handleSubmit}>
                         <div className={styles.customRow}>
-                            <div className={styles.customCol}>
-                                <label>Supplier <span className={styles.labeltag}>. . . . . . . . . . . </span></label>
+                            <div className={styles.customColLeft}>
+                                <label>Supplier <span className={styles.labeltag}>. . . . . . . . . . </span></label>
                                 <select className={styles.formcontrol} name="Supplier" value={Supplier} onChange={this.handleInputChange}>
                                     <option value="">Select Supplier</option>
                                     {this.props.supplierOptions.map(option => (
@@ -110,24 +110,24 @@ export class NewItemForm extends React.Component<NewItemFormProps, NewItemFormSt
                                     ))}
                                 </select>
                             </div>
-                            <div className={styles.customCol}>
+                            <div className={styles.customColRight}>
                                 <label>Item <span className={styles.labeltag}> . . . . . . . . . . . . . </span></label>
                                 <input className={styles.formcontrol} type="text" name="Item" value={Item} placeholder='Enter Item' onChange={this.handleInputChange} />
                             </div>
                         </div>
                         <div className={styles.customRow}>
-                            <div className={styles.customCol}>
-                                <label>Currency <span className={styles.labeltag}>. . . . . . . . . . </span></label>
+                            <div className={styles.customColLeft}>
+                                <label>Currency <span className={styles.labeltag}>. . . . . . . . . </span></label>
                                 <input className={styles.formcontrol} type="text" name="Currency" value={Currency} onChange={this.handleInputChange} />
                             </div>
-                            <div className={styles.customCol}>
+                            <div className={styles.customColRight}>
                                 <label>Price <span className={styles.labeltag}> . . . . . . . . . . . . </span></label>
                                 <input className={styles.formcontrol} type="number" name="Price" value={Price} onChange={this.handleInputChange} />
                             </div>
                         </div>
                         {this.props.editing && (
                             <div className={styles.customRow}>
-                                <div className={styles.customCol}>
+                                <div className={styles.customColLeft}>
                                     <label>Status <span className={styles.labeltag}>. . . . . . . . . . . . </span></label>
                                     <select className={styles.formcontrol} name="Status" value={Status} onChange={this.handleInputChange}>
                                         <option value="Active">Active</option>

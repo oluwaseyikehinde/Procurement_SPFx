@@ -2,35 +2,30 @@ import * as React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.min.js';
 import styles from '../../Procurement.module.scss';
-import { INewApproverFormFields } from './IApproverFields';
+import { INewAdminFormFields } from './IAdminFields';
 import { IWebPartProps } from "../../IProcurementProps";
 import toast from 'react-hot-toast';
 import { PeoplePicker, PrincipalType, IPeoplePickerContext } from "@pnp/spfx-controls-react/lib/PeoplePicker";
 import { WebPartContext } from "@microsoft/sp-webpart-base";
 import { Icon } from 'office-ui-fabric-react/lib/Icon';
 
-interface RoleOption {
-    ID: number;
-    Role: string;
-}
 
-interface NewApproverFormProps extends IWebPartProps {
-    formData: INewApproverFormFields & { id: number };
-    roleOptions: RoleOption[];
+interface NewAdminFormProps extends IWebPartProps {
+    formData: INewAdminFormFields & { id: number };
     editing: boolean;
-    onApproverSubmit: (formData: INewApproverFormFields & { id: number }) => void;
+    onAdminSubmit: (formData: INewAdminFormFields & { id: number }) => void;
     context: WebPartContext;
 }
 
-interface NewApproverFormState {
-    formData: INewApproverFormFields & { id: number };
+interface NewAdminFormState {
+    formData: INewAdminFormFields & { id: number };
     selectedPeople: any[];
     isFormValid: boolean;
     isSubmitting: boolean;
 }
 
-export class NewApproverForm extends React.Component<NewApproverFormProps, NewApproverFormState> {
-    constructor(props: NewApproverFormProps) {
+export class NewAdminForm extends React.Component<NewAdminFormProps, NewAdminFormState> {
+    constructor(props: NewAdminFormProps) {
         super(props);
         this.state = {
             formData: this.props.formData,
@@ -40,7 +35,7 @@ export class NewApproverForm extends React.Component<NewApproverFormProps, NewAp
         };
     }
 
-    componentDidUpdate(prevProps: NewApproverFormProps) {
+    componentDidUpdate(prevProps: NewAdminFormProps) {
         if (prevProps.formData !== this.props.formData) {
             this.setState({
                 formData: this.props.formData,
@@ -95,24 +90,22 @@ export class NewApproverForm extends React.Component<NewApproverFormProps, NewAp
         }
     };
 
-    isFormValid = (formData: INewApproverFormFields) => {
-        const { Personnel, Role, Level, Email, Status } = formData;
-        return Personnel !== '' && Role !== '' && Level !== 0 && Email !== '' && Status !== '';
+    isFormValid = (formData: INewAdminFormFields) => {
+        const { Personnel, AdminRole, Email } = formData;
+        return Personnel !== '' && AdminRole !== '' && Email !== '';
     };
 
     handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         this.setState({ isSubmitting: true });
         if (this.state.isFormValid) {
-            await this.props.onApproverSubmit(this.state.formData);
+            await this.props.onAdminSubmit(this.state.formData);
             this.setState({
                 formData: {
                     id: 0,
                     Personnel: '',
-                    Role: '',
-                    Level: 0,
-                    Email: '',
-                    Status: 'Active'
+                    AdminRole: '',
+                    Email: ''
                 },
                 selectedPeople: [],
                 isFormValid: false,
@@ -125,7 +118,7 @@ export class NewApproverForm extends React.Component<NewApproverFormProps, NewAp
     };
 
     render() {
-        const { Role, Level, Status } = this.state.formData;
+        const { AdminRole } = this.state.formData;
         const { editing } = this.props;
 
         const peoplePickerContext: IPeoplePickerContext = {
@@ -136,27 +129,10 @@ export class NewApproverForm extends React.Component<NewApproverFormProps, NewAp
 
         return (
             <div>
-                <h6 className={styles.mainheader}>New Approver</h6>
+                <h6 className={styles.mainheader}>New Admin</h6>
                 <hr />
                 <div className={styles.sectioncontainer}>
                     <form onSubmit={this.handleSubmit}>
-                        <div className={styles.customRow}>
-                            <div className={styles.customColLeft}>
-                                <label>Role <span className={styles.labeltag}> . . . . . . . . . . . . . </span></label>
-                                <select className={styles.formcontrol} name="Role" value={Role} onChange={this.handleInputChange}>
-                                    <option value="">Select Role</option>
-                                    {this.props.roleOptions.map(option => (
-                                        <option key={option.ID} value={option.Role}>
-                                            {option.Role}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className={styles.customColRight}>
-                                <label>Level <span className={styles.labeltag}>. . . . . . . . . . . .</span></label>
-                                <input className={styles.formcontrol} type="text" name="Level" value={Level} onChange={this.handleInputChange} />
-                            </div>
-                        </div>
                         <div className={styles.customRow}>
                             <div className={styles.customColWithPicker}>
                                 <label>Personnel <span className={styles.labeltag}>. . . . . . . .  </span></label>
@@ -189,15 +165,14 @@ export class NewApproverForm extends React.Component<NewApproverFormProps, NewAp
                                     }}
                                 />
                             </div>
-                            {this.props.editing && (
-                                <div className={styles.customColRight}>
-                                    <label>Status <span className={styles.labeltag}>. . . . . . . . . . . </span></label>
-                                    <select className={styles.formcontrol} name="Status" value={Status} onChange={this.handleInputChange}>
-                                        <option value="Active">Active</option>
-                                        <option value="Inactive">Inactive</option>
-                                    </select>
-                                </div>
-                            )}
+                            <div className={styles.customColRight}>
+                                <label>Role <span className={styles.labeltag}> . . . . . . . . . . . . . </span></label>
+                                <select className={styles.formcontrol} name="AdminRole" value={AdminRole} onChange={this.handleInputChange}>
+                                    <option value="">Select AdminRole</option>
+                                    <option value="Manager">Manager</option>
+                                    <option value="Admin">Admin</option>
+                                </select>
+                            </div>
                         </div>
 
                         <div className={styles.buttoncontainer}>
@@ -220,4 +195,4 @@ export class NewApproverForm extends React.Component<NewApproverFormProps, NewAp
             </div>
         );
     }
-}
+} 
