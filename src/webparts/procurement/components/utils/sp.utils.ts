@@ -102,7 +102,7 @@ export const createMyRequestListItem = async (context: any, listName: string, li
         if (approvers.length > 0) {
         // Send email notification to initiator
         const initiatorSubject = "New Procurement Request Created";
-        const initiatorBody = `<p>Your request has been successfully created and sent for approval to ${currentApproverPersonnel} (${currentApproverRole}).</p>
+            const initiatorBody = `<p>Your request has been successfully created and sent for approval to ${currentApproverRole} (${currentApproverPersonnel}).</p>
                                <p></p>
                                <p>Regards</p>`;
         await sendEmail(context, [Email], initiatorSubject, initiatorBody);

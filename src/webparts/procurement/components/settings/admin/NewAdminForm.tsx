@@ -134,36 +134,45 @@ export class NewAdminForm extends React.Component<NewAdminFormProps, NewAdminFor
                 <div className={styles.sectioncontainer}>
                     <form onSubmit={this.handleSubmit}>
                         <div className={styles.customRow}>
-                            <div className={styles.customColWithPicker}>
+                            <div className={styles.customColLeft}>
                                 <label>Personnel <span className={styles.labeltag}>. . . . . . . .  </span></label>
-                                <PeoplePicker
-                                    context={peoplePickerContext}
-                                    titleText=""
-                                    groupName={""}
-                                    personSelectionLimit={1}
-                                    showtooltip={true}
-                                    required={true}
-                                    placeholder='Search Personnel'
-                                    disabled={false}
-                                    onChange={this.handlePeoplePickerChange}
-                                    showHiddenInUI={false}
-                                    principalTypes={[PrincipalType.User]}
-                                    resolveDelay={1000}
-                                    defaultSelectedUsers={this.state.selectedPeople.map(person => person.secondaryText)}
-                                    styles={{
-                                        text: {
-                                            width: '115%',
-                                            height: '35px',
-                                            padding: '0px',
-                                            border: '1px solid #ccc',
-                                            background: '#fff',
-                                            borderRadius: '3px',
-                                            fontSize: '12px',
-                                            marginBottom: '20px',
-                                            marginLeft: '0px'
-                                        }
-                                    }}
-                                />
+                                <div className={styles.pickerContainer}>
+                                    <input
+                                        className={styles.hiddenInput}
+                                        type="text"
+                                        name="hiddenInput"
+                                        disabled
+                                    />
+                                    <PeoplePicker
+                                        context={peoplePickerContext}
+                                        titleText=""
+                                        groupName={""}
+                                        personSelectionLimit={1}
+                                        showtooltip={true}
+                                        required={true}
+                                        placeholder='Search Personnel'
+                                        disabled={false}
+                                        onChange={this.handlePeoplePickerChange}
+                                        showHiddenInUI={false}
+                                        principalTypes={[PrincipalType.User]}
+                                        resolveDelay={1000}
+                                        defaultSelectedUsers={this.state.selectedPeople.map(person => person.secondaryText)}
+                                        styles={{
+                                            text: {
+                                                width: '100%',
+                                                height: '35px',
+                                                padding: '0px',
+                                                border: '0px solid #ccc',
+                                                background: 'transpatent',
+                                                borderRadius: '0px',
+                                                fontSize: '12px',
+                                                margin: '20px',
+                                                gridColumn: '1',
+                                                gridRow: '1'
+                                            }
+                                        }}
+                                    />
+                                </div>
                             </div>
                             <div className={styles.customColRight}>
                                 <label>Role <span className={styles.labeltag}> . . . . . . . . . . . . . </span></label>

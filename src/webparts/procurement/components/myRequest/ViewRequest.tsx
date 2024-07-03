@@ -66,7 +66,7 @@ export class RecordsTable extends React.Component<IWebPartProps, RecordsTableSta
         }
     }
 
-    handleClick = (event: React.MouseEvent<HTMLAnchorElement>, number: number) => {
+    handleClick = (event: React.MouseEvent<HTMLButtonElement>, number: number) => {
         event.preventDefault();
         this.setState({ currentPage: number });
     };
@@ -210,13 +210,13 @@ export class RecordsTable extends React.Component<IWebPartProps, RecordsTableSta
                             ))}
                         </tbody>
                     </table>
-                    <nav>
+                            <nav className={styles.paginationcontainer}>
                         <ul className="pagination pagination-sm justify-content-center">
                             {pageNumbers.map(number => (
                                 <li key={number} className={`page-item ${currentPage === number ? 'active' : ''}`}>
-                                    <a href="!#" className="page-link" onClick={(e) => this.handleClick(e, number)}>
+                                    <button className="page-link" onClick={(e) => this.handleClick(e, number)}>
                                         {number}
-                                    </a>
+                                    </button>
                                 </li>
                             ))}
                         </ul>

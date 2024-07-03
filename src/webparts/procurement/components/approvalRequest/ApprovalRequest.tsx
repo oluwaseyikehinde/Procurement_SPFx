@@ -64,7 +64,7 @@ export class ApprovalRecordsTable extends React.Component<IWebPartProps, Approva
         }
     }
 
-    handleClick = (event: React.MouseEvent<HTMLAnchorElement>, number: number) => {
+    handleClick = (event: React.MouseEvent<HTMLButtonElement>, number: number) => {
         event.preventDefault();
         this.setState({ currentPage: number });
     };
@@ -143,7 +143,7 @@ export class ApprovalRecordsTable extends React.Component<IWebPartProps, Approva
         }
 
         return (
-            <div>
+            <div className={styles.maincontainer}>
                 <div className={styles.filtercontainer}>
                     <div style={{ cursor: 'pointer' }}>
                         <Icon iconName={sortDirection === 'asc' ? 'SortUp' : 'SortDown'} onClick={this.handleSort} />
@@ -177,6 +177,7 @@ export class ApprovalRecordsTable extends React.Component<IWebPartProps, Approva
                                 <th scope="col">Initiator</th>
                                 <th scope="col">Department</th>
                                 <th scope="col">Status</th>
+                                <th scope="col">Approval Stage</th>
                                 <th scope="col">Request Date</th>
                                 <th scope="col">Actions</th>
                             </tr>
@@ -187,6 +188,7 @@ export class ApprovalRecordsTable extends React.Component<IWebPartProps, Approva
                                     <td>{record.Initiator}</td>
                                     <td>{record.Department}</td>
                                     <td>{record.ApprovalStatus}</td>
+                                    <td>{record.ApprovalStage}</td>
                                     <td>{moment(record.Created).format('DD-MMM-YYYY')}</td>
                                     <td>
                                         <button
@@ -200,13 +202,13 @@ export class ApprovalRecordsTable extends React.Component<IWebPartProps, Approva
                             ))}
                         </tbody>
                     </table>
-                    <nav>
+                    <nav className={styles.paginationcontainer}>
                         <ul className="pagination pagination-sm justify-content-center">
                             {pageNumbers.map(number => (
                                 <li key={number} className={`page-item ${currentPage === number ? 'active' : ''}`}>
-                                    <a href="!#" className="page-link" onClick={(e) => this.handleClick(e, number)}>
+                                    <button className="page-link" onClick={(e) => this.handleClick(e, number)}>
                                         {number}
-                                    </a>
+                                    </button>
                                 </li>
                             ))}
                         </ul>

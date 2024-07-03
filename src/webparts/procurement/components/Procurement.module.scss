@@ -1,9 +1,14 @@
 @import '~@fluentui/react/dist/sass/References.scss';
 
+* {
+  margin: 0 !important;
+}
+
 .maincontainer {
   padding: 10px;
   background: #f2f2f2;
   height: 70dvh !important;
+  width: 93vw !important;
 }
 
 .mainheader {
@@ -21,9 +26,9 @@
 }
 
 label {
-  margin-bottom: 5px;
+  padding-left: 10px;
   font-weight: 400;
-  width: 120px;
+  width: 130px;
 }
 
 .tableform {
@@ -38,6 +43,7 @@ label {
 }
 
 .editableTable {
+  margin: 5px 0px !important;
 
   th,
   td {
@@ -89,19 +95,24 @@ table {
 .customRow {
   display: flex;
   flex-wrap: wrap;
+  margin-bottom: 5px !important;
   justify-content: space-between;
 }
 
 .customColLeft {
+  display: flex;
   flex: 1;
   max-width: 50%;
   margin-right: 5px;
+  justify-content: space-between;
 }
 
 .customColRight {
+  display: flex;
   flex: 1;
   max-width: 50%;
   margin-left: 5px;
+  justify-content: space-between;
 }
 
 .customColWithPicker {
@@ -117,6 +128,8 @@ table {
 
 .customColWithPicker .ms-PeoplePicker {
   flex-grow: 1;
+  grid-column: 1;
+  grid-row: 1;
 }
 
 .customColWithDropdown {
@@ -291,7 +304,7 @@ button[type="submit"][disabled] {
   width: 80px;
   background-color: #6c757d;
   color: #fff;
-  margin: 0px 3px;
+  margin: 0px 3px !important;
   border: none;
   border-radius: 0px;
   cursor: pointer;
@@ -303,6 +316,10 @@ button[type="submit"][disabled] {
     color: #6c757d;
     border: 1px solid #6c757d;
   }
+}
+
+.paginationcontainer{
+  margin: 5px !important;
 }
 
 .searchbutton {
@@ -470,4 +487,24 @@ button[type="submit"][disabled] {
   margin-bottom: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
+}
+
+.pickerContainer {
+    position: relative;
+    display: grid;
+    width: calc(100% - 125px);
+}
+
+.hiddenInput:disabled {
+    position: absolute;
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    background: #fff;
+    border-radius: 3px;
+    font-size: 12px;
+    margin-bottom: 20px;
+    margin-left: 5px;
+    grid-column: 1;
+    grid-row: 1;
 }

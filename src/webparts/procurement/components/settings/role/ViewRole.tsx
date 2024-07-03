@@ -33,7 +33,7 @@ export class RolesTable extends React.Component<RolesTableProps, RolesTableState
         };
     }
 
-    handleClick = (event: React.MouseEvent<HTMLAnchorElement>, pageNumber: number) => {
+    handleClick = (event: React.MouseEvent<HTMLButtonElement>, pageNumber: number) => {
         event.preventDefault();
         this.setState({ currentPage: pageNumber });
     };
@@ -95,13 +95,13 @@ export class RolesTable extends React.Component<RolesTableProps, RolesTableState
                             ))}
                         </tbody>
                     </table>
-                    <nav>
+                    <nav className={styles.paginationcontainer}>
                         <ul className="pagination pagination-sm justify-content-center">
                             {pageNumbers.map(number => (
                                 <li key={number} className={`page-item ${currentPage === number ? 'active' : ''}`}>
-                                    <a href="!#" className="page-link" onClick={(e) => this.handleClick(e, number)}>
+                                    <button className="page-link" onClick={(e) => this.handleClick(e, number)}>
                                         {number}
-                                    </a>
+                                    </button>
                                 </li>
                             ))}
                         </ul>
