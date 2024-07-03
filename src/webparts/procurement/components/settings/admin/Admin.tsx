@@ -138,7 +138,9 @@ export class Admin extends React.Component<IWebPartProps, AdminState> {
                                     <Icon iconName="ErrorBadge" onClick={this.closeModal} className={styles.closeButton} />
                                 </span>
                             </h4>
-                            <p>Are you sure you want to delete {this.state.itemToDelete?.Personnel}?</p>
+                            <div className={styles.modalRecord}>
+                                <p>Are you sure you want to delete {this.state.itemToDelete?.Personnel}?</p>
+                            </div>
                             <div className={styles.buttoncontainer}>
                                 {this.state.deleting ? (
                                     <button className={styles.submitingbutton} disabled>

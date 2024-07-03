@@ -99,15 +99,17 @@ export const createMyRequestListItem = async (context: any, listName: string, li
         const currentApproverPersonnel = approvers[0].Personnel;
         const currentApproverRole = approvers[0].Role;
         
+        // Construct the approval URL
+        const absoluteUrl = context.pageContext.web.absoluteUrl;
+        const approvalUrl = `${absoluteUrl}#/approval`;
+
         if (approvers.length > 0) {
-        // Send email notification to initiator
-        const initiatorSubject = "New Procurement Request Created";
+            // Send email notification to initiator
+            const initiatorSubject = "New Procurement Request Created";
             const initiatorBody = `<p>Your request has been successfully created and sent for approval to ${currentApproverRole} (${currentApproverPersonnel}).</p>
                                <p></p>
                                <p>Regards</p>`;
-        await sendEmail(context, [Email], initiatorSubject, initiatorBody);
-
-
+            await sendEmail(context, [Email], initiatorSubject, initiatorBody);
 
             // Send email notification to current approver
             const approverSubject = "New Request Pending Approval";
@@ -115,7 +117,8 @@ export const createMyRequestListItem = async (context: any, listName: string, li
                                   <p>Details:</p>
                                   <p>Initiator: ${Initiator}</p>
                                   <p>Department: ${Department}</p>
-                                  ${lineItemsTable}`;
+                                  ${lineItemsTable}
+                                  <p><a href="${approvalUrl}">Click here to approve the request</a></p>`;
             await sendEmail(context, [currentApproverEmail], approverSubject, approverBody);
         }
 
@@ -295,6 +298,10 @@ export const approveRequest = async (context: any, listName: string, itemId: num
         const currentApproverPersonnel = currentApprover[0].Personnel;
         const currentApproverRole = currentApprover[0].Role;
 
+        // Construct the approval URL
+        const absoluteUrl = context.pageContext.web.absoluteUrl;
+        const approvalUrl = `${absoluteUrl}#/approval`;
+
         // Get the next approver details if there is any
         const nextApprover = await sp.web.lists.getByTitle(listNames.approvers).items.filter(`Level eq ${nextApprovalStage} and Status eq 'Active'`)();
 
@@ -317,7 +324,8 @@ export const approveRequest = async (context: any, listName: string, itemId: num
                                   <p>Initiator: ${currentItem.Initiator}</p>
                                   <p>Department: ${currentItem.Department}</p>
                                   <p>Comment: ${comment}</p>
-                                  ${lineItemsTable}`;
+                                  ${lineItemsTable}
+                                  <p><a href="${approvalUrl}">Click here to approve the request</a></p>`;
             await sendEmail(context, [nextApproverEmail], approverSubject, approverBody);
         } else {
             // No next approver, notify initiator

@@ -134,7 +134,7 @@ export class NewAdminForm extends React.Component<NewAdminFormProps, NewAdminFor
                 <div className={styles.sectioncontainer}>
                     <form onSubmit={this.handleSubmit}>
                         <div className={styles.customRow}>
-                            <div className={styles.customColLeft}>
+                            <div className={styles.customCol}>
                                 <label>Personnel <span className={styles.labeltag}>. . . . . . . .  </span></label>
                                 <div className={styles.pickerContainer}>
                                     <input
@@ -174,7 +174,7 @@ export class NewAdminForm extends React.Component<NewAdminFormProps, NewAdminFor
                                     />
                                 </div>
                             </div>
-                            <div className={styles.customColRight}>
+                            <div className={styles.customCol}>
                                 <label>Role <span className={styles.labeltag}> . . . . . . . . . . . . . </span></label>
                                 <select className={styles.formcontrol} name="AdminRole" value={AdminRole} onChange={this.handleInputChange}>
                                     <option value="">Select AdminRole</option>

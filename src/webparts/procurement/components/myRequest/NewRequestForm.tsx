@@ -169,11 +169,11 @@ export class NewRequestForm extends React.Component<IWebPartProps, NewRequestFor
                 <div className={styles.sectioncontainer}>
                     <form onSubmit={this.handleSubmit}>
                         <div className={styles.customRow}>
-                            <div className={styles.customColLeft}>
+                            <div className={styles.customCol}>
                                 <label>Initiator <span className={styles.labeltag}>. . . . . . . . . . </span></label>
                                 <input className={styles.formcontrol} type="text" name="Initiator" value={Initiator} onChange={this.handleInputChange} disabled />
                             </div>
-                            <div className={styles.customColRight}>
+                            <div className={styles.customCol}>
                                 <label>Department <span className={styles.labeltag}>. . . . . . </span></label>
                                 <input className={styles.formcontrol} type="text" name="Department" value={Department} onChange={this.handleInputChange} disabled />
                             </div>

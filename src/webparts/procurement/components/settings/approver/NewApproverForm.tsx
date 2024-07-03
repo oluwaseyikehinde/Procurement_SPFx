@@ -141,7 +141,7 @@ export class NewApproverForm extends React.Component<NewApproverFormProps, NewAp
                 <div className={styles.sectioncontainer}>
                     <form onSubmit={this.handleSubmit}>
                         <div className={styles.customRow}>
-                            <div className={styles.customColLeft}>
+                            <div className={styles.customCol}>
                                 <label>Role <span className={styles.labeltag}> . . . . . . . . . . . . . </span></label>
                                 <select className={styles.formcontrol} name="Role" value={Role} onChange={this.handleInputChange}>
                                     <option value="">Select Role</option>
@@ -152,13 +152,13 @@ export class NewApproverForm extends React.Component<NewApproverFormProps, NewAp
                                     ))}
                                 </select>
                             </div>
-                            <div className={styles.customColRight}>
+                            <div className={styles.customCol}>
                                 <label>Level <span className={styles.labeltag}>. . . . . . . . . . . .</span></label>
                                 <input className={styles.formcontrol} type="text" name="Level" value={Level} onChange={this.handleInputChange} />
                             </div>
                         </div>
                         <div className={styles.customRow}>
-                            <div className={styles.customColLeft}>
+                            <div className={styles.customCol}>
                                 <label>Personnel <span className={styles.labeltag}>. . . . . . . .  </span></label>
                                 <div className={styles.pickerContainer}>
                                     <input
@@ -199,7 +199,7 @@ export class NewApproverForm extends React.Component<NewApproverFormProps, NewAp
                                 </div>
                             </div>
                             {this.props.editing && (
-                                <div className={styles.customColRight}>
+                                <div className={styles.customCol}>
                                     <label>Status <span className={styles.labeltag}>. . . . . . . . . . . </span></label>
                                     <select className={styles.formcontrol} name="Status" value={Status} onChange={this.handleInputChange}>
                                         <option value="Active">Active</option>

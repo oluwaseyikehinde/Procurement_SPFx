@@ -135,10 +135,9 @@ async function createAuditLogTable(sp: any) {
         await createField(list, "Number", "RelationshipId");
         await createField(list, "Text", "InitiatorFullName", { MaxLength: 255 });
         await createField(list, "Text", "InitiatorEmail", { MaxLength: 255 });
-        await createField(list, "Text", "MoreInfo", { MaxLength: 255 });
+        await createField(list, "Text", "ActivityStage", { MaxLength: 255 });
         await createField(list, "Text", "Information", { MaxLength: 255 });
         await createField(list, "Text", "ListName", { MaxLength: 255 });
-        await createField(list, "DateTime", "ActionDate");
     } catch (error) {
         console.error("Error creating Procurement Audit Log:", error);
     }

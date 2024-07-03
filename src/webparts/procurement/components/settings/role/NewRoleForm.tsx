@@ -89,18 +89,18 @@ export class NewRoleForm extends React.Component<NewRoleFormProps, NewRoleFormSt
                 <div className={styles.sectioncontainer}>
                     <form onSubmit={this.handleSubmit}>
                         <div className={styles.customRow}>
-                            <div className={styles.customColLeft}>
+                            <div className={styles.customCol}>
                                 <label>Role <span className={styles.labeltag}> . . . . . . . . . . . . . </span></label>
                                 <input className={styles.formcontrol} type="text" name="Role" value={Role} placeholder='Enter Role' onChange={this.handleInputChange} />
                             </div>
-                            <div className={styles.customColRight}>
+                            <div className={styles.customCol}>
                                 <label>Description <span className={styles.labeltag}> . . . . . . . </span></label>
                                 <input className={styles.formcontrol} type="text" name="Description" value={Description} placeholder='Enter Description' onChange={this.handleInputChange} />
                             </div>
                         </div>
                         {this.props.editing && (
                             <div className={styles.customRow}>
-                                <div className={styles.customColLeft}>
+                                <div className={styles.customCol}>
                                     <label>Status <span className={styles.labeltag}>. . . . . . . . . . . . </span></label>
                                     <select className={styles.formcontrol} name="Status" value={Status} onChange={this.handleInputChange}>
                                         <option value="Active">Active</option>
