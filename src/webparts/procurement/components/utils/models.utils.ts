@@ -135,7 +135,7 @@ async function createAuditLogTable(sp: any) {
         await createField(list, "Number", "RelationshipId");
         await createField(list, "Text", "InitiatorFullName", { MaxLength: 255 });
         await createField(list, "Text", "InitiatorEmail", { MaxLength: 255 });
-        await createField(list, "Text", "MoreInitiatorInfo", { MaxLength: 255 });
+        await createField(list, "Text", "MoreInfo", { MaxLength: 255 });
         await createField(list, "Text", "Information", { MaxLength: 255 });
         await createField(list, "Text", "ListName", { MaxLength: 255 });
         await createField(list, "DateTime", "ActionDate");
@@ -189,9 +189,7 @@ async function checkAdminListAndAddCurrentUserIfEmpty(context: any, sp: any) {
             });
 
             console.log("Added current user to Admin list.");
-        } else {
-            console.log("Admin list already populated. Skipping addition.");
-        }
+        } 
     } catch (error) {
         console.error("Error checking admin list and adding current user:", error);
         throw error;

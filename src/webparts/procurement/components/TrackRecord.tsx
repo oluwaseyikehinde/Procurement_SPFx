@@ -63,7 +63,7 @@ class RecordDetailTracker extends React.Component<RecordDetailTrackerProps, Reco
 
         return (
             <div className={styles.overlay}>
-                <div className={styles.modal}>
+                <div className={styles.trackmodal}>
                         <div>
                             <Icon iconName="ErrorBadge" onClick={onClose} className={styles.closeButton} />
                         </div>

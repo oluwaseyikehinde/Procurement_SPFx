@@ -119,8 +119,6 @@ export const createMyRequestListItem = async (context: any, listName: string, li
             await sendEmail(context, [currentApproverEmail], approverSubject, approverBody);
         }
 
-
-
        return newItem.data;
     } catch (error) {
         console.error('Error creating list item:', error);
@@ -178,8 +176,6 @@ export const createListItem = async (context: any, listName: string, itemPropert
         const initiatorFullName = userData.displayName;
         const initiatorEmail = userData.mail;
 
-        const currentDate = moment().format('YYYY-MM-DDTHH:mm:ssZ');
-
         // Log the action in the audit log
         await sp.web.lists.getByTitle(listNames.auditLog).items.add({
             Type: 'Create',
@@ -187,9 +183,8 @@ export const createListItem = async (context: any, listName: string, itemPropert
             RelationshipId: newItem.ID,
             InitiatorFullName: initiatorFullName || 'Unknown',
             InitiatorEmail: initiatorEmail || 'Unknown',
-            MoreInitiatorInfo: 'More Info',
+            ActivityStage: '0',
             Information: `Created item in list ${listName}`,
-            ActionDate: currentDate,
             ListName: listName
         });
 
@@ -210,9 +205,6 @@ export const updateListItem = async (context: any, listName: string, itemId: num
         const initiatorFullName = userData.displayName;
         const initiatorEmail = userData.mail;
 
-        // Get the current date in the format SharePoint expects
-        const currentDate = moment().format('YYYY-MM-DDTHH:mm:ssZ');
-
         // Log the action in the audit log
         await sp.web.lists.getByTitle(listNames.auditLog).items.add({
             Type: 'Update',
@@ -220,9 +212,8 @@ export const updateListItem = async (context: any, listName: string, itemId: num
             RelationshipId: itemId,
             InitiatorFullName: initiatorFullName || 'Unknown',
             InitiatorEmail: initiatorEmail || 'Unknown',
-            MoreInitiatorInfo: 'More Info',
+            ActivityStage: '0',
             Information: `Updated item in list ${listName}`,
-            ActionDate: currentDate,
             ListName: listName
         });
     } catch (error) {
@@ -242,8 +233,6 @@ export const deleteListItem = async (context: any, listName: string, itemId: num
         const initiatorFullName = userData.displayName;
         const initiatorEmail = userData.mail;
 
-        const currentDate = moment().format('YYYY-MM-DDTHH:mm:ssZ');
-
         // Log the action in the audit log
         await sp.web.lists.getByTitle(listNames.auditLog).items.add({
             Type: 'Delete',
@@ -251,9 +240,8 @@ export const deleteListItem = async (context: any, listName: string, itemId: num
             RelationshipId: itemId,
             InitiatorFullName: initiatorFullName || 'Unknown',
             InitiatorEmail: initiatorEmail || 'Unknown',
-            MoreInitiatorInfo: 'More Info',
+            ActivityStage: '0',
             Information: `Deleted item in list ${listName}`,
-            ActionDate: currentDate,
             ListName: listName
         });
     } catch (error) {
@@ -279,8 +267,6 @@ export const approveRequest = async (context: any, listName: string, itemId: num
         const lineItems = await sp.web.lists.getByTitle(listNames.requestItem).items.filter(`ProcurementId eq ${itemId}`)();
         const lineItemsTable = formatLineItemsTable(lineItems);
 
-        const currentDate = moment().format('YYYY-MM-DDTHH:mm:ssZ');
-
         // Determine the next approval status and stage
         const nextApprovalStage = currentApprovalStage + 1;
         const approvalStatus = nextApprovalStage > activeApproversCount ? 'Approved' : 'Pending';
@@ -299,9 +285,8 @@ export const approveRequest = async (context: any, listName: string, itemId: num
             RelationshipId: itemId,
             InitiatorFullName: initiatorFullName,
             InitiatorEmail: initiatorEmail,
-            MoreInitiatorInfo: 'More Info',
-            Information: comment || 'No Comment',
-            ActionDate: currentDate,
+            ActivityStage: currentApprovalStage.toString(),
+            Information: comment,
             ListName: listName
         });
 
@@ -322,7 +307,7 @@ export const approveRequest = async (context: any, listName: string, itemId: num
             // Send email notification to initiator
             const initiatorSubject = "Request Approved";
             const initiatorBody = `<p>Your request has been approved by the ${currentApproverRole} (${currentApproverPersonnel}) and sent to the ${nextApproverRole} (${nextApproverPersonnel}).</p>
-                                   <p>Comment: ${comment || 'No Comment'}</p>`;
+                                   <p>Comment: ${comment}</p>`;
             await sendEmail(context, [currentItem.Email], initiatorSubject, initiatorBody);
 
             // Send email notification to next approver
@@ -331,14 +316,14 @@ export const approveRequest = async (context: any, listName: string, itemId: num
                                   <p>Details:</p>
                                   <p>Initiator: ${currentItem.Initiator}</p>
                                   <p>Department: ${currentItem.Department}</p>
-                                  <p>Comment: ${comment || 'No Comment'}</p>
+                                  <p>Comment: ${comment}</p>
                                   ${lineItemsTable}`;
             await sendEmail(context, [nextApproverEmail], approverSubject, approverBody);
         } else {
             // No next approver, notify initiator
             const initiatorSubject = "Request Approved";
             const initiatorBody = `<p>Your request has been approved by the ${currentApproverRole} (${currentApproverPersonnel}) and is pending no further approval.</p>
-                                   <p>Comment: ${comment || 'No Comment'}</p>`;
+                                   <p>Comment: ${comment}</p>`;
             await sendEmail(context, [currentItem.Email], initiatorSubject, initiatorBody);
         }
 
@@ -365,8 +350,6 @@ export const rejectRequest = async (context: any, listName: string, itemId: numb
         const lineItems = await sp.web.lists.getByTitle(listNames.requestItem).items.filter(`ProcurementId eq ${itemId}`)();
         const lineItemsTable = formatLineItemsTable(lineItems);
 
-        const currentDate = moment().format('YYYY-MM-DDTHH:mm:ssZ');
-
         // Determine the next approval status and stage
         const approvalStatus = 'Rejected';
 
@@ -383,9 +366,8 @@ export const rejectRequest = async (context: any, listName: string, itemId: numb
             RelationshipId: itemId,
             InitiatorFullName: initiatorFullName,
             InitiatorEmail: initiatorEmail,
-            MoreInitiatorInfo: 'More Info',
+            ActivityStage: currentApprovalStage.toString(),
             Information: comment,
-            ActionDate: currentDate,
             ListName: listName
         });
 

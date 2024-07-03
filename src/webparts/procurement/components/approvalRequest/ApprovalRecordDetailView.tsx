@@ -57,11 +57,16 @@ class ApprovalRecordDetailView extends React.Component<RecordDetailViewProps, Re
     }
 
     handleApprove = async () => {
+        const { context, record, refreshRecords } = this.props;
+        const { comment, activeApproversCount } = this.state;
+
+        if (comment.trim() === '') {
+            toast.error('Comment is required to approve the request.');
+            return;
+        }
+
         try {
             this.setState({ approvalAction: 'Approve', isSubmitting: true });
-            const { context, record, refreshRecords } = this.props;
-            const { comment, activeApproversCount } = this.state;
-
             await approveRequest(context, listNames.request, record.Id, comment, activeApproversCount);
             toast.success('Request Approved successfully!');
             this.setState({ approvalAction: null, isSubmitting: false });
@@ -112,7 +117,7 @@ class ApprovalRecordDetailView extends React.Component<RecordDetailViewProps, Re
 
         return (
             <div className={styles.overlay}>
-                <div className={styles.modal}>
+                <div className={styles.viewmodal}>
                     <h4>
                         Record Details
                         <span>

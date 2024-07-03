@@ -132,7 +132,7 @@ export class Admin extends React.Component<IWebPartProps, AdminState> {
                 />
                 {this.state.showModal && (
                     <div className={styles.overlay}>
-                        <div className={styles.modal}>
+                        <div className={styles.deletemodal}>
                             <h4>Confirm Delete
                                 <span>
                                     <Icon iconName="ErrorBadge" onClick={this.closeModal} className={styles.closeButton} />

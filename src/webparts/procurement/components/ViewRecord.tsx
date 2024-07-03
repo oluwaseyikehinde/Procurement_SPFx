@@ -52,7 +52,7 @@ class RecordDetailView extends React.Component<RecordDetailViewProps, RecordDeta
 
         return (
             <div className={styles.overlay}>
-                <div className={styles.modal}>
+                <div className={styles.viewmodal}>
                     <h4>
                         Record Details
                         <span>
