@@ -2,6 +2,7 @@ import { SPFx as spSPFx, spfi } from "@pnp/sp";
 import "@pnp/sp/webs";
 import "@pnp/sp/lists";
 import "@pnp/sp/items";
+import { createBatch } from "@pnp/sp/batching";
 import { getLoggedInUserData, sendEmail } from "./graph.utils";
 import { listNames } from "./models.utils";
 import * as moment from 'moment';
@@ -77,7 +78,11 @@ export const createMyRequestListItem = async (context: any, listName: string, li
         // Save each grid row to the Procurement Item List
         let gridItemPropertiesArray: any[] = [];
         if (itemProperties.gridRows && itemProperties.gridRows.length > 0) {
-            const gridItemsPromises = itemProperties.gridRows.map(async (gridRow: any) => {
+            const listGrid = sp.web.lists.getByTitle(listItemName);
+            const [batchedListBehavior, execute] = createBatch(listGrid);
+            listGrid.using(batchedListBehavior);
+
+            itemProperties.gridRows.forEach((gridRow: any) => {
                 // Omit TotalPrice and Id from grid row properties
                 const { TotalPrice, Id, ...gridItemProperties } = gridRow;
 
@@ -85,10 +90,10 @@ export const createMyRequestListItem = async (context: any, listName: string, li
                 gridItemProperties.ProcurementId = ProcurementId;
 
                 // Add grid row to Procurement Item List
-                await sp.web.lists.getByTitle(listItemName).items.add(gridItemProperties);
+                listGrid.items.add(gridItemProperties);
                 gridItemPropertiesArray.push(gridItemProperties);
             });
-            await Promise.all(gridItemsPromises);
+            await execute();
         }
 
         // Get current lineItem Records
@@ -382,7 +387,6 @@ export const rejectRequest = async (context: any, listName: string, itemId: numb
         const currentApprover = await sp.web.lists.getByTitle(listNames.approvers).items.filter(`Level eq ${currentApprovalStage} and Status eq 'Active'`)();
         const currentApproverPersonnel = currentApprover[0].Personnel;
         const currentApproverRole = currentApprover[0].Role;
-        const currentApproverEmail = currentApprover[0].Email;
         
         if (currentApprover.length > 0) {
         // Send email notification to initiator
@@ -394,16 +398,7 @@ export const rejectRequest = async (context: any, listName: string, itemId: numb
                                ${lineItemsTable}`;
         await sendEmail(context, [currentItem.Email], initiatorSubject, initiatorBody);
 
-        // Send email notification to current approver
-        const approverSubject = "Request Rejected";
-            const approverBody = `<p>A request you has been rejected.</p>
-                                  <p>Details:</p>
-                                  <p>Initiator: ${currentItem.Initiator}</p>
-                                  <p>Department: ${currentItem.Department}</p>
-                                  <p>Comment: ${comment}</p>
-                                  ${lineItemsTable}`;
-            await sendEmail(context, [currentApproverEmail], approverSubject, approverBody);
-        }
+      }
 
     } catch (error) {
         console.error('Error rejecting request:', error);
