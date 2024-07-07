@@ -3,11 +3,12 @@ import * as React from 'react';
 interface TableProps {
     data: any[];
     columns: { header: string, key: string }[];
+    className?: string;
 }
 
-const Table: React.FC<TableProps> = ({ data, columns }) => {
+const Table: React.FC<TableProps> = ({ data, columns, className }) => {
     return (
-        <table>
+        <table className={className}>
             <thead>
                 <tr>
                     {columns.map((col) => (
