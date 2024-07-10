@@ -4,8 +4,8 @@ import { Route, HashRouter as Router, Switch } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { SideNavigation } from './SideNavigation/SideNavigation';
 import { Request } from './myRequest/Request';
-import { Home } from './home/Home';
-import { Dashboard } from './dashboard/Dashboard';
+import { GeneralDashboard } from './dashboard/GeneralDashboard';
+import { PersonalDashboard } from './dashboard/PersonalDashboard';
 import { AllRecordsTable } from './allRequest/AllRequest';
 import { ApprovalRecordsTable } from './approvalRequest/ApprovalRequest';
 import { Settings } from './settings/Settings';
@@ -64,10 +64,10 @@ export default class Procurement extends React.Component<IProcurementProps, Proc
             />
             <Switch>
               <Route exact path="/">
-                <Home context={this.props.context} />
+                <GeneralDashboard context={this.props.context} />
               </Route>
               <Route exact path="/dashboard">
-                <Dashboard context={this.props.context} />
+                <PersonalDashboard context={this.props.context} />
               </Route>
               <Route exact path="/request">
                 <Request context={this.props.context} />

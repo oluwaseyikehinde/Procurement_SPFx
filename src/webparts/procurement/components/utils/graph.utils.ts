@@ -1,6 +1,5 @@
 import { SPFx as graphSPFX, graphfi } from "@pnp/graph";
 import "@pnp/graph/users";
-//import { Client } from "@microsoft/microsoft-graph-client";
 import { MSGraphClient } from '@microsoft/sp-http';
 
 export async function getLoggedInUserData(context: any) {
